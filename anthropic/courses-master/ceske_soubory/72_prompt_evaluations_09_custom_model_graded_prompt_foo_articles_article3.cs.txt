@@ -1,0 +1,7 @@
+# Backpropagation
+
+Ceska studentska kopie datoveho clanku pro sumarizacni evaluaci. Originalni soubor `article3.txt` ma priblizne 5846 anglickych slov a slouzi jako dlouhy vstup pro model.
+
+Text popisuje backpropagation jako metodu pro vypocet gradientu a trenovani neuronovych siti. V evaluaci testuje, zda model umi slozity matematicko-technicky postup prevest do srozumitelneho shrnuti.
+
+Poznamka pro vyuku: pokud chcete spustit puvodni promptfoo evaluaci beze zmen, ponechte konfiguraci namirenou na originalni anglicky soubor. Tato ceska kopie slouzi studentum k pochopeni obsahu vstupniho clanku a k pripadne ceske variante cviceni.

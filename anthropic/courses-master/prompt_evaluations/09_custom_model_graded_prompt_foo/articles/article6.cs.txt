@@ -1,0 +1,7 @@
+# Graficke procesorove jednotky GPU
+
+Ceska studentska kopie datoveho clanku pro sumarizacni evaluaci. Originalni soubor `article6.txt` ma priblizne 3716 anglickych slov a slouzi jako dlouhy vstup pro model.
+
+Text vysvetluje, co je GPU, jak se vyvinulo od graficke akcelerace k obecnym vypoctum a proc je dulezite pro moderni AI. V evaluaci testuje, zda shrnuti zachyti historii i hlavni vyuziti.
+
+Poznamka pro vyuku: pokud chcete spustit puvodni promptfoo evaluaci beze zmen, ponechte konfiguraci namirenou na originalni anglicky soubor. Tato ceska kopie slouzi studentum k pochopeni obsahu vstupniho clanku a k pripadne ceske variante cviceni.

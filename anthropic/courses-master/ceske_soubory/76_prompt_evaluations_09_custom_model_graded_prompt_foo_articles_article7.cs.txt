@@ -1,0 +1,7 @@
+# IBM Watson
+
+Ceska studentska kopie datoveho clanku pro sumarizacni evaluaci. Originalni soubor `article7.txt` ma priblizne 5615 anglickych slov a slouzi jako dlouhy vstup pro model.
+
+Text popisuje system IBM Watson, jeho schopnost odpovidat na otazky v prirozenem jazyce a souvislost s projektem DeepQA. V evaluaci je uzitecny jako clanek kombinujici historii, technologii a prakticke ukazky AI.
+
+Poznamka pro vyuku: pokud chcete spustit puvodni promptfoo evaluaci beze zmen, ponechte konfiguraci namirenou na originalni anglicky soubor. Tato ceska kopie slouzi studentum k pochopeni obsahu vstupniho clanku a k pripadne ceske variante cviceni.

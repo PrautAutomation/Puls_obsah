@@ -1,0 +1,7 @@
+# Velke jazykove modely (LLM)
+
+Ceska studentska kopie datoveho clanku pro sumarizacni evaluaci. Originalni soubor `article1.txt` ma priblizne 6209 anglickych slov a slouzi jako dlouhy vstup pro model.
+
+Text popisuje, co jsou velke jazykove modely, jak se trenuji na rozsahlych textovych datech a proc umi generovat jazyk, klasifikovat text, odpovidat na otazky a plnit dalsi NLP ulohy. V evaluaci slouzi jako dlouhy technicky clanek, ktery ma model zjednodusit pro mladsi nebo netechnicke publikum.
+
+Poznamka pro vyuku: pokud chcete spustit puvodni promptfoo evaluaci beze zmen, ponechte konfiguraci namirenou na originalni anglicky soubor. Tato ceska kopie slouzi studentum k pochopeni obsahu vstupniho clanku a k pripadne ceske variante cviceni.

@@ -1,0 +1,7 @@
+# Word embeddings
+
+Ceska studentska kopie datoveho clanku pro sumarizacni evaluaci. Originalni soubor `article2.txt` ma priblizne 1448 anglickych slov a slouzi jako dlouhy vstup pro model.
+
+Text vysvetluje reprezentaci slov pomoci vektoru, ktere zachycuji vyznamove vztahy mezi slovy. V evaluaci je vhodny pro test, zda sumarizacni prompt dokaze zachovat hlavni myslenku bez zbytecnych technickych detailu.
+
+Poznamka pro vyuku: pokud chcete spustit puvodni promptfoo evaluaci beze zmen, ponechte konfiguraci namirenou na originalni anglicky soubor. Tato ceska kopie slouzi studentum k pochopeni obsahu vstupniho clanku a k pripadne ceske variante cviceni.

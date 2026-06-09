@@ -1,0 +1,7 @@
+# Zpracovani prirozeneho jazyka NLP
+
+Ceska studentska kopie datoveho clanku pro sumarizacni evaluaci. Originalni soubor `article8.txt` ma priblizne 4593 anglickych slov a slouzi jako dlouhy vstup pro model.
+
+Text vysvetluje NLP jako oblast informatiky a AI zamerenou na praci s daty v prirozenem jazyce. V evaluaci slouzi jako obecny technicky clanek, ktery ma model prevest do kratkeho, jednoducheho a presneho shrnuti.
+
+Poznamka pro vyuku: pokud chcete spustit puvodni promptfoo evaluaci beze zmen, ponechte konfiguraci namirenou na originalni anglicky soubor. Tato ceska kopie slouzi studentum k pochopeni obsahu vstupniho clanku a k pripadne ceske variante cviceni.

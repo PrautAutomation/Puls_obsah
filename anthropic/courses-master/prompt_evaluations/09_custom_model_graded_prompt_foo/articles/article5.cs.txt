@@ -1,0 +1,7 @@
+# Rozpoznavani rukopisu
+
+Ceska studentska kopie datoveho clanku pro sumarizacni evaluaci. Originalni soubor `article5.txt` ma priblizne 1772 anglickych slov a slouzi jako dlouhy vstup pro model.
+
+Text popisuje technologie pro rozpoznavani rucne psaneho textu z dokumentu, obrazku nebo dotykovych zarizeni. V evaluaci slouzi jako stredne dlouhy vstup s jasnym praktickym tematem.
+
+Poznamka pro vyuku: pokud chcete spustit puvodni promptfoo evaluaci beze zmen, ponechte konfiguraci namirenou na originalni anglicky soubor. Tato ceska kopie slouzi studentum k pochopeni obsahu vstupniho clanku a k pripadne ceske variante cviceni.

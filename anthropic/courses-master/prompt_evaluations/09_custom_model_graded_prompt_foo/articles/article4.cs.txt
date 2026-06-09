@@ -1,0 +1,7 @@
+# Konvolucni neuronove site
+
+Ceska studentska kopie datoveho clanku pro sumarizacni evaluaci. Originalni soubor `article4.txt` ma priblizne 9331 anglickych slov a slouzi jako dlouhy vstup pro model.
+
+Text se venuje CNN, filtrum, vrstvam a pouziti pri zpracovani obrazu. V evaluaci je to dlouhy a technicky narocny vstup, na kterem se dobre ukazuje rozdil mezi slabym a dobre navrzenym sumarizacnim promptem.
+
+Poznamka pro vyuku: pokud chcete spustit puvodni promptfoo evaluaci beze zmen, ponechte konfiguraci namirenou na originalni anglicky soubor. Tato ceska kopie slouzi studentum k pochopeni obsahu vstupniho clanku a k pripadne ceske variante cviceni.
