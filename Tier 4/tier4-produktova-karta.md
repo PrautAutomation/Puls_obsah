@@ -20,27 +20,23 @@
 
 ### Tohle pro tebe není, pokud:
 
-- Claude jsi nikdy nepoužil — začni s Tier 1 nebo 2
+- Claude jsi nikdy nepoužil — začni s Tier 1
 - Chceš Clauda jen používat, ne stavět infrastrukturu — Tier 2 nebo 3 stačí
-- Setup dokument ti zabere víc než 5 hodin — pravděpodobně budeš mít víc z Tier 3, který tě na Tier 4 připraví systematicky
+- Nemáš základní programátorské znalosti a nechceš se je učit
 
 ---
 
 ## Co potřebuješ před startem
 
-Tier 4 nepotřebuje předchozí tiery — ale potřebuje znalosti a nástroje. **Setup dokument „Než začneš"** ti řekne přesně co, a u každého bodu co neumíš najdeš vysvětlení a mini úkol.
+Před Dnem 1 projdi **Setup dokument „Než začneš"** a odškrtni všechny body:
 
-Stručně — potřebuješ:
-- ☐ Claude Code na pokročilé úrovni (ne "zkusil jsem jednou")
-- ☐ Funkční Claude API volání z Pythonu
-- ☐ Bezpečnostní povědomí — prompt injection, obranné techniky
-- ☐ Python nebo Node.js, VS Code, GitHub, základní git
-- ☐ Strukturované prompty — XML tagy, system prompty
-
-**Absolvoval jsi Tier 3?** Setup zabere 15 minut.
-**Jsi vývojář, co zná Claude?** 1-2 hodiny.
-**Jsi builder bez Tier 3?** 3-5 hodin, ale zvládneš to.
-**Setup ti zabere víc než 5 hodin?** Zvaž Tier 3 — dá ti strukturovaný základ.
+- ☐ Účet na claude.ai + console.anthropic.com s API klíčem
+- ☐ Claude Code na pokročilé úrovni
+- ☐ VS Code s Claude integrací
+- ☐ Python 3.10+ a/nebo Node.js 18+
+- ☐ GitHub účet, základní git
+- ☐ Funkční API volání
+- ☐ Základní programátorské koncepty
 
 ---
 
