@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULS · Component Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-canvas:#0B0E14;--glass-1:rgba(255,255,255,0.04);--glass-2:rgba(255,255,255,0.06);--glass-3:rgba(255,255,255,0.08);
+  --glass-border:rgba(255,255,255,0.08);--glass-border-strong:rgba(255,255,255,0.12);
+  --text-primary:#F4F6FA;--text-secondary:#B8C0D0;--text-muted:#A4ACBE;--accent:#8D2AF3;--accent-soft:rgba(141,42,243,0.12);--accent-glow:rgba(141,42,243,0.22);
+  --success:#10B981;--success-bg:rgba(16,185,129,0.08);--success-border:rgba(52,211,153,0.34);
+  --font-primary:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'IBM Plex Mono','Fira Code',monospace;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--color-canvas);color:var(--text-secondary);font-family:var(--font-primary);line-height:1.6;padding:40px 24px 90px}
+.wrap{max-width:1240px;margin:0 auto}
+.hero{margin-bottom:34px}
+.eyebrow,.section-label{display:inline-flex;align-items:center;gap:8px;color:var(--text-muted);font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase}
+.eyebrow::before,.section-label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+h1{color:var(--text-primary);font-size:clamp(1.45rem,2.8vw,2.25rem);line-height:1.08;margin:12px 0}
+.hero p,.section-copy{max-width:80ch;color:var(--text-muted);font-size:.9rem}
+.toc,.link-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.toc a,.link-row a{color:var(--text-secondary);text-decoration:none;font-family:var(--font-mono);font-size:.72rem;padding:8px 10px;border-radius:var(--radius-sm);background:var(--glass-1);border:1px solid var(--glass-border);transition:background .2s,border-color .2s,color .2s}
+.toc a:hover,.link-row a:hover{background:var(--glass-2);border-color:var(--glass-border-strong);color:var(--text-primary)}
+.section{margin-top:42px}
+.section-head{margin-bottom:18px}
+.section-title{color:var(--text-primary);font-size:1.06rem;font-weight:700;margin-top:8px}
+.grid{display:grid;gap:16px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.metric-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.metric-row.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.card,.panel{
+  background:var(--glass-1);
+  border:1px solid var(--glass-border);
+  transition:background .2s,border-color .2s,transform .2s,box-shadow .2s;
+}
+.card:hover,.panel:hover{
+  background:var(--glass-2);
+  border-color:var(--glass-border-strong);
+  transform:translateY(-1px);
+}
+.card{border-radius:var(--radius-md);padding:16px}
+.panel{border-radius:var(--radius-lg);padding:20px}
+.mini{color:var(--text-muted);font-family:var(--font-mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase}
+.title{color:var(--text-primary);font-size:.94rem;font-weight:700;line-height:1.35;margin:8px 0}
+.body{color:var(--text-secondary);font-size:.81rem;line-height:1.55}
+.rule-box{margin-top:12px;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);font-family:var(--font-mono);font-size:.74rem;color:var(--text-secondary);line-height:1.55}
+.accent-card{
+  background:linear-gradient(135deg,rgba(141,42,243,0.12),transparent 58%),var(--glass-2);
+  border:1px solid rgba(141,42,243,0.24);
+  box-shadow:0 0 0 1px rgba(141,42,243,0.08),0 20px 60px rgba(141,42,243,0.08);
+}
+.accent-card:hover{
+  background:linear-gradient(135deg,rgba(141,42,243,0.14),transparent 56%),var(--glass-3);
+  box-shadow:0 0 0 1px rgba(141,42,243,0.1),0 24px 70px rgba(141,42,243,0.12);
+}
+.list{display:grid;gap:10px}
+.li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--glass-border)}
+.li:last-child{border-bottom:0}
+.token{display:inline-flex;align-items:center;padding:3px 8px;border-radius:var(--radius-sm);border:1px solid rgba(52,211,153,0.18);background:rgba(16,185,129,0.04);color:rgba(16,185,129,0.78);font-family:var(--font-mono);font-size:.72rem;font-weight:700}
+.nav-preview{
+  display:flex;justify-content:space-between;gap:16px;align-items:center;
+  padding:18px 20px;border-radius:18px;background:var(--glass-1);border:1px solid var(--glass-border);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.30)
+}
+.pill-nav{
+  display:flex;align-items:center;gap:4px;padding:4px 6px;background:var(--glass-1);border:1px solid var(--glass-border);
+  border-radius:999px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)
+}
+.pill-nav span{
+  min-height:32px;padding:6px 12px;border-radius:999px;color:var(--text-secondary);font:500 .84rem var(--font-primary);
+  border:1px solid transparent;transition:background .2s,border-color .2s,color .2s
+}
+.pill-nav span:hover{background:var(--glass-3);color:var(--text-primary)}
+.pill-nav .active{color:var(--text-primary);background:var(--glass-3);border:1px solid rgba(141,42,243,0.28);box-shadow:inset 0 -2px 0 var(--accent)}
+.donut{width:120px;height:120px;border-radius:50%;border:10px solid rgba(255,255,255,0.09);display:grid;place-items:center;position:relative}
+.donut::after{content:"";position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:var(--success)}
+.donut strong{color:var(--text-primary);font-size:2rem;line-height:1}
+.checklist-row{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:14px;align-items:start;padding:14px 12px;border:1px solid transparent;border-radius:10px;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.checklist-row:hover{background:var(--glass-2);border-color:var(--glass-border-strong);transform:translateY(-1px)}
+.checklist-row + .checklist-row{margin-top:6px}
+.box{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.22);margin-top:4px}
+.check-title{color:var(--text-primary);font-size:.95rem;font-weight:650;line-height:1.3}
+.check-sub{color:var(--text-secondary);font-size:.82rem;line-height:1.35;margin-top:2px}
+.quest-row{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid transparent;border-radius:10px;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.quest-row:hover{background:var(--glass-2);border-color:var(--glass-border-strong);transform:translateY(-1px)}
+.quest-row__box{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--glass-border-strong)}
+.quest-row.is-done{background:var(--success-bg);border-color:rgba(52,211,153,0.2)}
+.quest-row.is-done .quest-row__box{background:var(--success);border-color:var(--success);position:relative}
+.quest-row.is-done .quest-row__box::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#052e1d;font-size:12px;font-weight:800}
+.quest-row__title{color:var(--text-primary);font-size:.84rem;font-weight:600;line-height:1.35}
+.day-tile{min-height:190px}
+@media(max-width:1020px){.grid.two,.grid.three,.metric-row,.metric-row.five{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">PULS frontend</div>
+    <h1>Component Library Handoff</h1>
+    <p>Tohle je hlavní review dokument. Nejdřív kontroluj tenhle soubor. Detailní `component-*.html` showcase soubory jsou až druhá vrstva, když potřebuješ hlubší rozpad patternu. Teď už jsou tady pohromadě quiet core, brand accents, day detail, shared app patterns i page blueprints.</p>
+    <nav class="toc">
+      <a href="#core">Quiet Core</a>
+      <a href="#brand">Brand Accents</a>
+      <a href="#day">Day View</a>
+      <a href="#shared">Shared App</a>
+      <a href="#blueprints">Blueprints</a>
+    </nav>
+  </header>
+
+  <section class="section" id="core">
+    <div class="section-head">
+      <div class="section-label">Shared layer</div>
+      <div class="section-title">Quiet Core</div>
+      <p class="section-copy">Default systém pro většinu aplikace. Vychází z `studium-final`: glass surfaces, jemný border, hezký hover přes `glass-2 + border-strong + translateY(-1px)`, ale bez agresivního glowa jako defaultu.</p>
+    </div>
+    <div class="grid three">
+      <div class="card">
+        <div class="mini">Surface card</div>
+        <div class="title">Malá karta</div>
+        <div class="body">Tasky, tiles, score cards, kompaktní obsahové bloky.</div>
+        <div class="rule-box">hover = `background: glass-2`, `border-color: glass-border-strong`, `transform: translateY(-1px)`</div>
+      </div>
+      <div class="panel">
+        <div class="mini">Surface panel</div>
+        <div class="title">Větší panel</div>
+        <div class="body">Sidebar bloky, checklisty, kalendář, glossary drawer, utility panely.</div>
+        <div class="rule-box">Panel může mít bohatší obsah, ale pořád drží stejný hover language jako card.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">Utility</div>
+        <div class="title">Shared UI primitives</div>
+        <div class="body">Meta label, XP pill, icon button, search input, segmented tabs.</div>
+        <div style="margin-top:10px" class="token">+40 b</div>
+      </div>
+    </div>
+    <div class="link-row"><a href="./component-primitives.html">Detail primitives</a></div>
+  </section>
+
+  <section class="section" id="brand">
+    <div class="section-head">
+      <div class="section-label">Special layer</div>
+      <div class="section-title">Brand Accents</div>
+      <p class="section-copy">Fialový glow a purple tint nikam nemizí. Jen nejsou default na všem. Patří do hero, selected a featured stavů. Sebastianův závěr: slabá fialová typografie na tmě nestačí, nosný kontrast musí dělat `text-primary`.</p>
+    </div>
+    <div class="grid two">
+      <div class="panel accent-card">
+        <div class="mini">Hero surface</div>
+        <div class="title">DayHeader / featured shell</div>
+        <div class="body">Glow, accent surface a brand emphasis patří sem, ne do běžných tasků a row patterns.</div>
+        <div class="rule-box">background: linear-gradient(135deg, rgba(141,42,243,0.12), transparent 58%), var(--glass-2)<br>border: 1px solid rgba(141,42,243,0.24)</div>
+      </div>
+      <div class="panel">
+        <div class="mini">Allowed uses</div>
+        <div class="list">
+          <div class="li"><span>Aktivní top nav</span><span>ano</span></div>
+          <div class="li"><span>Selected day tile</span><span>ano</span></div>
+          <div class="li"><span>TaskCard default</span><span>ne</span></div>
+          <div class="li"><span>QuestRow default</span><span>ne</span></div>
+        </div>
+        <div class="rule-box">Purple text na tmavém backgroundu nikdy nenechávej jako jediný kontrastní signál. Aktivní a důležité texty mají jít do `text-primary`, fialová zůstává accent.</div>
+      </div>
+    </div>
+    <div class="link-row"><a href="./component-brand-accents.html">Detail brand accents</a></div>
+  </section>
+
+  <section class="section" id="day">
+    <div class="section-head">
+      <div class="section-label">Detail page system</div>
+      <div class="section-title">Day Content View Components</div>
+      <p class="section-copy">Tady se skládá detail dne: hero, obsahové tasky, quest sidebar a glossary vrstva. Rozdíl mezi quiet core a selected/done stavy musí být dobře vidět, ale nesmí přepadnout do overdesignu.</p>
+    </div>
+    <div class="grid three">
+      <div class="card accent-card">
+        <div class="mini">DayHeader</div>
+        <div class="title">Hero detail dne</div>
+        <div class="body">Speciální header pattern se silnější brand expresí. Musí být stručný, operativní a bez opakování stejné informace v několika vrstvách.</div>
+        <div class="rule-box">Header detailu dne má nést jen jednu navigační vrstvu, jednu stručnou větu o dnešku, jedno meta pásmo a jednu jasnou primary akci. Neopakuj den kurzu, výstup ani stav dne v dalších dekoračních blocích.</div>
+      </div>
+      <div class="card">
+        <div class="mini">TaskCard</div>
+        <div class="title">Obsah dne</div>
+        <div class="body">Tichá obsahová karta. Volitelné listy a code block.</div>
+        <div class="rule-box">Hover je schválně hezký a živý jako v referenci. Žádný barevný pruh jako default, ale ani mrtvá karta bez reakce.</div>
+      </div>
+      <div class="card">
+        <div class="mini">QuestRow</div>
+        <div class="title">Denní sidebar row</div>
+        <div class="body">Krátký checklist pattern s XP a lehkým done stavem.</div>
+        <div class="quest-row" style="margin-top:12px">
+          <span class="quest-row__box"></span>
+          <span class="quest-row__title">Přečíst příručku</span>
+          <span class="token">+30 b</span>
+        </div>
+        <div class="quest-row is-done" style="margin-top:6px">
+          <span class="quest-row__box"></span>
+          <span class="quest-row__title">Napsat manifest „Proč Claude“</span>
+          <span class="token" style="color:var(--success);background:var(--success-bg);border-color:var(--success-border)">+60 b</span>
+        </div>
+        <div class="rule-box">Default XP pill je utlumený. Done stav smí zesílit tint i pill, aby reward byl opravdu čitelný.</div>
+      </div>
+      <div class="card">
+        <div class="mini">GlossaryTermAccordion</div>
+        <div class="title">Knowledge row</div>
+        <div class="body">Lehký accordion item, ne card-in-card pattern.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">GlossaryDrawer</div>
+        <div class="title">Knowledge panel</div>
+        <div class="body">Search, tabs a list termů v pravém utilitárním draweru.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">Sidebar contract</div>
+        <div class="title">Pracovní pomoc, ne archiv</div>
+        <div class="body">Sidebar detailu dne drží questy, habits, pokrok a glossary utility. Referenční zdroje nejsou default obsah sidebaru.</div>
+        <div class="rule-box">U Dne 1 je správný empty state pro předešlé lekce. Další dny už tento blok přechází do reálného pokrokového panelu.</div>
+      </div>
+    </div>
+    <div class="link-row">
+      <a href="./component-day-header.html">DayHeader</a>
+      <a href="./component-task-card.html">TaskCard</a>
+      <a href="./component-quest-row.html">QuestRow</a>
+      <a href="./component-glossary-term-accordion.html">GlossaryTermAccordion</a>
+      <a href="./component-glossary-drawer.html">GlossaryDrawer</a>
+    </div>
+    <div class="rule-box" style="margin-top:14px">Day detail rule: jedna informace = jeden nosič. Stav dne, výstup dne a completion summary se nesmí opakovat v pillech, meta řádcích, hero textu a dalších blocích zároveň.</div>
+  </section>
+
+  <section class="section" id="shared">
+    <div class="section-head">
+      <div class="section-label">App-level patterns</div>
+      <div class="section-title">Shared App Components</div>
+      <p class="section-copy">Patterny odchycené z aktuálních Planner, Studium, Profile a Meets obrazovek, které dává smysl znovu použít napříč aplikací. Tady už nestačí jen “mini ukázka”; u důležitých patternů ukazuju rovnou i chování a usage rules.</p>
+    </div>
+    <div class="grid three">
+      <div class="panel">
+        <div class="nav-preview">
+        <div>
+          <div class="mini">TopAppShell</div>
+          <div class="title">App header a nav cluster</div>
+          <div class="body">Samostatný glass shell s vlastní hloubkou. Nesmí se ztratit do okolního panelu jako duch.</div>
+        </div>
+        <div class="pill-nav"><span class="active">Planner</span><span>Studium</span><span>Meets</span></div>
+        </div>
+        <div class="rule-box">Vrstva 1 = outer shell s blur a shadow. Vrstva 2 = nav cluster. Vrstva 3 = active item s button feeling. Právě tahle trojvrstva drží hloubku reference.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">SectionShell</div>
+        <div class="title">Page container</div>
+        <div class="body">Velký page blok se section headerem a vnitřním layoutem.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">ProgressDonutCard</div>
+        <div class="title">Kruhový progress panel</div>
+        <div class="body">Status, dokončeno, cíl a den kurzu.</div>
+        <div style="margin-top:14px" class="donut"><strong>0</strong></div>
+      </div>
+      <div class="panel">
+        <div class="mini">StatStrip</div>
+        <div class="title">Přehled průběhu</div>
+        <div class="body">Horizontální souhrn pro kurz, dny a body.</div>
+        <div class="rule-box">Podle reference může mít lehký purple-tinted background nebo accent border, ale text musí zůstat v `text-primary` / `text-secondary`.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">InfoMetricCard</div>
+        <div class="title">Malý metrický blok</div>
+        <div class="body">Délka, tempo, milník, splněno.</div>
+      </div>
+      <div class="card">
+        <div class="mini">CoursePlanCard</div>
+        <div class="title">Přehled plánu</div>
+        <div class="body">Tier/plan overview karta pro studijní přehled.</div>
+      </div>
+      <div class="card day-tile">
+        <div class="mini">DayTile</div>
+        <div class="title">Den 1</div>
+        <div class="body">Přehledová denní karta v týdenním gridu. Odlišná od TaskCard.</div>
+        <div class="rule-box">Selected state může nést purple tint a accent border. Hover zůstává ve stejném jazyce jako course-day-card v referenci.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">ChecklistPanel</div>
+        <div class="title">Panelový seznam</div>
+        <div class="body">Širší dashboardový list s title, subline a XP/časem.</div>
+        <div class="rule-box">Je interaktivní. Každý řádek musí mít hover, pointer a čitelný actionable state.</div>
+        <div class="checklist-row">
+          <div class="box"></div>
+          <div>
+            <div class="check-title">Týdenní report s Claudem</div>
+            <div class="check-sub">Claude Cowork, Excel, PowerPoint a Microsoft 365</div>
+          </div>
+          <div class="token">+80 b</div>
+        </div>
+        <div class="checklist-row">
+          <div class="box"></div>
+          <div>
+            <div class="check-title">Týdenní thinking výzva</div>
+            <div class="check-sub">Extended Thinking</div>
+          </div>
+          <div class="token">+60 b</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="mini">CalendarPanel</div>
+        <div class="title">Minikalendář</div>
+        <div class="body">Výběr dne a denní přehled položek.</div>
+      </div>
+      <div class="card">
+        <div class="mini">TopicScoreCard</div>
+        <div class="title">Tematická skóre</div>
+        <div class="body">Přehled oblasti a bodového zisku.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">PomodoroPanel</div>
+        <div class="title">Timer blok</div>
+        <div class="body">Časovač s primárním a sekundárním CTA.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">AgendaPanel</div>
+        <div class="title">Agenda / checklist</div>
+        <div class="body">Panel s meeting checklistem a sekundárním metadatovým blokem.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">ToolIconBar</div>
+        <div class="title">Ovládací lišta</div>
+        <div class="body">Kompaktní řada ikonových ovladačů s active/hover stavy.</div>
+      </div>
+      <div class="panel accent-card">
+        <div class="mini">MeetingLaunchPanel</div>
+        <div class="title">Launch a room identity</div>
+        <div class="body">Room identity, status a hlavní CTA pro spuštění schůzky.</div>
+      </div>
+    </div>
+    <div class="link-row">
+      <a href="./component-top-app-shell.html">TopAppShell</a>
+      <a href="./component-section-shell.html">SectionShell</a>
+      <a href="./component-stat-strip.html">StatStrip</a>
+      <a href="./component-progress-donut-card.html">ProgressDonutCard</a>
+      <a href="./component-info-metric-card.html">InfoMetricCard</a>
+      <a href="./component-course-plan-card.html">CoursePlanCard</a>
+      <a href="./component-day-tile.html">DayTile</a>
+      <a href="./component-checklist-panel.html">ChecklistPanel</a>
+      <a href="./component-calendar-panel.html">CalendarPanel</a>
+      <a href="./component-topic-score-card.html">TopicScoreCard</a>
+      <a href="./component-pomodoro-panel.html">PomodoroPanel</a>
+      <a href="./component-agenda-panel.html">AgendaPanel</a>
+      <a href="./component-tool-icon-bar.html">ToolIconBar</a>
+      <a href="./component-meeting-launch-panel.html">MeetingLaunchPanel</a>
+    </div>
+  </section>
+
+  <section class="section" id="blueprints">
+    <div class="section-head">
+      <div class="section-label">Composition</div>
+      <div class="section-title">Page Blueprints</div>
+      <p class="section-copy">Dokumentované kompoziční návrhy pro reálné stránky. Z těchto blueprintů by měl vývojář být schopný začít skládat obrazovky bez dalších designových otázek.</p>
+    </div>
+    <div class="metric-row five">
+      <div class="card">
+        <div class="mini">Implemented page</div>
+        <div class="title">Day Content View</div>
+        <div class="body">Hotová složená obrazovka: DayHeader, task list, QuestRow panel, glossary vrstva a funkční drawer interakce.</div>
+      </div>
+      <div class="card"><div class="mini">Blueprint</div><div class="title">Planner Overview</div><div class="body">Stat strip, checklist panels, progress a utility side panels.</div></div>
+      <div class="card"><div class="mini">Blueprint</div><div class="title">Study Plan Overview</div><div class="body">SectionShell, plan cards, metrics a day tile grid.</div></div>
+      <div class="card"><div class="mini">Blueprint</div><div class="title">Profile Topics Overview</div><div class="body">Grid topic score cards a související summary shell.</div></div>
+      <div class="card"><div class="mini">Blueprint</div><div class="title">Meets Control View</div><div class="body">Meeting launch panel, agenda, tool icon bar a side utility workflow.</div></div>
+    </div>
+    <div class="rule-box">Review workflow: pro rychlou kontrolu otevři nejdřív jen tento soubor. Detailní `component-*.html` showcase soubory řeš až ve chvíli, kdy potřebuješ hlubší rozpad konkrétního patternu.</div>
+    <div class="link-row">
+      <a href="./day-content-view.html">Otevřít Day Content View</a>
+      <a href="./page-blueprints.md">Otevřít page blueprints</a>
+    </div>
+  </section>
+</div>
+</body>
+</html>

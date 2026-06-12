@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULS · TaskCard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-canvas:#0B0E14;
+  --color-surface-1:rgba(255,255,255,0.04);
+  --color-surface-2:rgba(255,255,255,0.06);
+  --color-surface-3:rgba(255,255,255,0.08);
+  --color-border-soft:rgba(255,255,255,0.08);
+  --color-border-strong:rgba(255,255,255,0.12);
+  --color-text-primary:#F4F6FA;
+  --color-text-secondary:#B8C0D0;
+  --color-text-muted:#8B93A7;
+  --color-accent:#8D2AF3;
+  --color-success:#10B981;
+  --color-success-bg:rgba(16,185,129,0.08);
+  --color-success-border:rgba(52,211,153,0.34);
+  --font-primary:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono','Fira Code',monospace;
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:20px;
+  --space-6:24px;
+  --space-8:32px;
+  --space-10:40px;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:14px;
+  --radius-full:9999px;
+  --ease-standard:cubic-bezier(0.4,0,0.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;
+  background:var(--color-canvas);
+  color:var(--color-text-secondary);
+  font-family:var(--font-primary);
+  padding:var(--space-10) var(--space-6);
+  line-height:1.55;
+}
+.wrap{max-width:860px;margin:0 auto}
+.showcase-title{
+  color:var(--color-text-primary);
+  font-size:clamp(1.2rem,2.2vw,1.65rem);
+  font-weight:750;
+  margin-bottom:6px;
+}
+.showcase-sub{
+  max-width:64ch;
+  color:var(--color-text-muted);
+  font-size:0.84rem;
+  margin-bottom:var(--space-8);
+}
+.showcase-sub code,
+.group-note code{
+  font-family:var(--font-mono);
+  font-size:0.78rem;
+  color:var(--color-text-secondary);
+  background:var(--color-surface-2);
+  border:1px solid var(--color-border-soft);
+  border-radius:var(--radius-sm);
+  padding:1px 6px;
+}
+.group{margin-bottom:var(--space-10)}
+.group-label{
+  display:flex;
+  align-items:center;
+  gap:var(--space-2);
+  margin-bottom:var(--space-4);
+  font-family:var(--font-mono);
+  font-size:0.66rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+  color:var(--color-text-muted);
+}
+.group-label .dot{width:6px;height:6px;border-radius:50%;background:var(--color-accent)}
+.group-note{font-size:0.78rem;color:var(--color-text-muted);margin-bottom:var(--space-4)}
+.stack{display:grid;gap:var(--space-4)}
+.ui-surface-card{
+  background:var(--color-surface-1);
+  border:1px solid var(--color-border-soft);
+  border-radius:var(--radius-md);
+  transition:background 0.2s var(--ease-standard),border-color 0.2s var(--ease-standard),transform 0.2s var(--ease-standard);
+}
+.ui-surface-card:hover,
+.ui-surface-card.is-hover{
+  background:var(--color-surface-2);
+  border-color:var(--color-border-strong);
+  transform:translateY(-1px);
+}
+.ui-meta-label{
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  color:var(--color-text-muted);
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+}
+.ui-title-sm{
+  color:var(--color-text-primary);
+  font-size:0.84rem;
+  font-weight:700;
+  line-height:1.35;
+}
+.ui-body-sm{
+  color:var(--color-text-secondary);
+  font-size:0.8rem;
+  line-height:1.6;
+}
+.ui-icon-button{
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--color-text-muted);
+  border-radius:var(--radius-sm);
+  padding:4px 6px;
+  font-family:var(--font-mono);
+  font-size:0.62rem;
+  cursor:pointer;
+  transition:background 0.15s var(--ease-standard),color 0.15s var(--ease-standard),border-color 0.15s var(--ease-standard);
+}
+.ui-icon-button:hover{
+  background:var(--color-surface-2);
+  border-color:var(--color-border-soft);
+  color:var(--color-text-primary);
+}
+.task-card{
+  padding:var(--space-4);
+}
+.task-card__meta{display:block;margin-bottom:var(--space-2)}
+.task-card__title{margin-bottom:var(--space-2)}
+.task-card__body p + p{margin-top:var(--space-2)}
+.task-card__list{
+  list-style:none;
+  display:grid;
+  gap:6px;
+  margin-top:var(--space-3);
+}
+.task-card__list li{
+  position:relative;
+  padding-left:var(--space-4);
+}
+.task-card__list li::before{
+  content:"";
+  position:absolute;
+  left:2px;
+  top:0.6em;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--color-accent);
+}
+.task-card__code{
+  margin-top:var(--space-3);
+  background:var(--color-surface-2);
+  border:1px solid var(--color-border-soft);
+  border-radius:var(--radius-md);
+  overflow:hidden;
+}
+.task-card__code-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px var(--space-3);
+  border-bottom:1px solid var(--color-border-soft);
+}
+.task-card__code pre{
+  padding:var(--space-3);
+  font-family:var(--font-mono);
+  font-size:0.76rem;
+  color:var(--color-text-secondary);
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="showcase-title">TaskCard</h1>
+  <p class="showcase-sub">
+    Hlavní obsahová karta pro sekci „Práce v Claude“. Drží quiet surface pattern, malý mono meta label
+    pro číslo úkolu a volitelný druhý vnitřní surface pro prompt nebo ukázku kódu.
+  </p>
+
+  <section class="group">
+    <div class="group-label"><span class="dot"></span>Stavy</div>
+    <div class="stack">
+      <article class="task-card ui-surface-card">
+        <span class="task-card__meta ui-meta-label">Úkol 01</span>
+        <h3 class="task-card__title ui-title-sm">Napiš manifest „Proč Claude“</h3>
+        <div class="task-card__body ui-body-sm">
+          <p>Řekni Claudovi o své práci a nech ho navrhnout, kde by ti pomohl. Projdi návrhy, vyber co sedí a přidej vlastní situace.</p>
+        </div>
+      </article>
+
+      <article class="task-card ui-surface-card is-hover">
+        <span class="task-card__meta ui-meta-label">Úkol 01</span>
+        <h3 class="task-card__title ui-title-sm">Napiš manifest „Proč Claude“</h3>
+        <div class="task-card__body ui-body-sm">
+          <p>Stejná karta v hover stavu. Surface zesvětlí jen lehce a border se zpevní. Žádné glow, žádný barevný pruh, žádná dramatická elevace.</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="group">
+    <div class="group-label"><span class="dot"></span>Varianty obsahu</div>
+    <p class="group-note">Karta má být obsahově pružná, ale vizuálně monotónní. Variabilita se řeší uvnitř, ne dekorací na okraji.</p>
+    <div class="stack">
+      <article class="task-card ui-surface-card">
+        <span class="task-card__meta ui-meta-label">Úkol 02</span>
+        <h3 class="task-card__title ui-title-sm">Zjisti, co používáš</h3>
+        <div class="task-card__body ui-body-sm">
+          <p>Zeptej se Clauda, jaký model právě používáš a jaké má limity. Odpověď si zkontroluj a ulož jako referenční poznámku.</p>
+        </div>
+      </article>
+
+      <article class="task-card ui-surface-card">
+        <span class="task-card__meta ui-meta-label">Úkol 03</span>
+        <h3 class="task-card__title ui-title-sm">Projdi jednu situaci od A do Z</h3>
+        <div class="task-card__body ui-body-sm">
+          <p>Vezmi jednu reálnou situaci a projdi ji kompletně. Na konci si zapiš:</p>
+          <ul class="task-card__list ui-body-sm">
+            <li>Jak začínám konverzaci?</li>
+            <li>Co dělám, když odpověď není dobrá?</li>
+            <li>Kdy zakládám nový chat?</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="task-card ui-surface-card">
+        <span class="task-card__meta ui-meta-label">Úkol 04</span>
+        <h3 class="task-card__title ui-title-sm">Vytvoř prompt šablonu</h3>
+        <div class="task-card__body ui-body-sm">
+          <p>Pro opakovaný úkol si připrav šablonu a drž stálou strukturu.</p>
+        </div>
+        <section class="task-card__code">
+          <div class="task-card__code-header">
+            <span class="ui-meta-label">Prompt</span>
+            <button class="ui-icon-button" type="button">Copy</button>
+          </div>
+          <pre>Pomoz mi s úkolem [název].
+Kontext: [situace]
+Cíl: [co má vzniknout]
+Výstup chci ve formátu: [tabulka / checklist / návrh / text]</pre>
+        </section>
+      </article>
+    </div>
+  </section>
+</div>
+</body>
+</html>

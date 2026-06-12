@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULS · GlossaryDrawer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-canvas:#0B0E14;
+  --color-surface-1:rgba(255,255,255,0.04);
+  --color-surface-2:rgba(255,255,255,0.06);
+  --color-border-soft:rgba(255,255,255,0.08);
+  --color-border-strong:rgba(255,255,255,0.12);
+  --color-text-primary:#F4F6FA;
+  --color-text-secondary:#B8C0D0;
+  --color-text-muted:#8B93A7;
+  --color-accent:#8D2AF3;
+  --font-primary:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono','Fira Code',monospace;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:20px;
+  --space-6:24px;
+  --space-8:32px;
+  --space-10:40px;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:14px;
+  --ease-standard:cubic-bezier(0.4,0,0.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;
+  background:var(--color-canvas);
+  color:var(--color-text-secondary);
+  font-family:var(--font-primary);
+  padding:var(--space-10) var(--space-6);
+}
+.wrap{max-width:1160px;margin:0 auto}
+.showcase-title{
+  color:var(--color-text-primary);
+  font-size:clamp(1.2rem,2.2vw,1.65rem);
+  font-weight:750;
+  margin-bottom:6px;
+}
+.showcase-sub{
+  max-width:70ch;
+  color:var(--color-text-muted);
+  font-size:0.84rem;
+  line-height:1.6;
+  margin-bottom:var(--space-8);
+}
+.layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 380px;
+  gap:var(--space-6);
+  align-items:start;
+}
+.canvas{
+  min-height:720px;
+  border:1px dashed rgba(255,255,255,0.12);
+  border-radius:var(--radius-lg);
+  background:rgba(255,255,255,0.02);
+  padding:var(--space-6);
+  color:var(--color-text-muted);
+  display:grid;
+  place-items:center;
+  text-align:center;
+}
+.glossary-drawer{
+  display:grid;
+  grid-template-rows:auto auto auto minmax(0,1fr);
+  min-height:720px;
+  background:var(--color-surface-1);
+  border:1px solid var(--color-border-soft);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+}
+.glossary-drawer__header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:var(--space-4);
+  padding:var(--space-5);
+  border-bottom:1px solid var(--color-border-soft);
+}
+.ui-meta-label{
+  color:var(--color-text-muted);
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+}
+.glossary-drawer__title{
+  color:var(--color-text-primary);
+  font-size:0.98rem;
+  font-weight:700;
+  margin-top:6px;
+}
+.ui-icon-button{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  border-radius:var(--radius-sm);
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--color-text-muted);
+  cursor:pointer;
+  transition:background 0.15s var(--ease-standard),color 0.15s var(--ease-standard),border-color 0.15s var(--ease-standard);
+}
+.ui-icon-button:hover{
+  background:var(--color-surface-2);
+  color:var(--color-text-primary);
+  border-color:var(--color-border-soft);
+}
+.glossary-drawer__search,
+.glossary-drawer__tabs{
+  padding:var(--space-4) var(--space-5) 0;
+}
+.ui-search-input{
+  width:100%;
+  min-height:40px;
+  border:1px solid var(--color-border-soft);
+  border-radius:var(--radius-md);
+  background:var(--color-surface-1);
+  color:var(--color-text-primary);
+  padding:0 12px;
+  font-size:0.84rem;
+}
+.ui-segmented-tabs{
+  display:flex;
+  gap:4px;
+  padding:4px;
+  background:var(--color-surface-1);
+  border:1px solid var(--color-border-soft);
+  border-radius:var(--radius-md);
+}
+.ui-segmented-tabs button{
+  border:0;
+  background:transparent;
+  color:var(--color-text-muted);
+  padding:8px 10px;
+  border-radius:var(--radius-sm);
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  cursor:pointer;
+}
+.ui-segmented-tabs .is-active{
+  background:var(--color-surface-2);
+  color:var(--color-text-primary);
+  border:1px solid rgba(255,255,255,0.1);
+}
+.glossary-drawer__list{
+  padding:var(--space-4) var(--space-5) var(--space-5);
+  overflow:auto;
+}
+.glossary-term{
+  border-bottom:1px solid var(--color-border-soft);
+}
+.glossary-term:last-child{border-bottom:0}
+.glossary-term__trigger{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--space-3);
+  padding:14px 0;
+  background:transparent;
+  border:0;
+  color:inherit;
+  text-align:left;
+  cursor:pointer;
+  transition:background 0.2s var(--ease-standard);
+}
+.glossary-term__trigger:hover{
+  background:rgba(255,255,255,0.02);
+}
+.glossary-term__title{
+  color:var(--color-text-primary);
+  font-size:0.84rem;
+  font-weight:650;
+  line-height:1.35;
+}
+.glossary-term__chevron{color:var(--color-text-muted)}
+.glossary-term__content{
+  display:none;
+  padding:0 0 14px;
+  color:var(--color-text-secondary);
+  font-size:0.8rem;
+  line-height:1.6;
+}
+.glossary-term.is-open .glossary-term__content{display:block}
+.glossary-term.is-open .glossary-term__trigger{padding-bottom:10px}
+.empty-state{
+  display:none;
+  padding:var(--space-6) 0;
+  color:var(--color-text-muted);
+  font-size:0.8rem;
+  line-height:1.6;
+}
+@media (max-width: 960px){
+  .layout{grid-template-columns:1fr}
+  .canvas{min-height:180px}
+  .glossary-drawer{min-height:640px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="showcase-title">GlossaryDrawer</h1>
+  <p class="showcase-sub">
+    Pravý utilitární drawer pro práci se slovníkem. Má sloužit jako knowledge panel, ne jako efektní modal.
+    Search, tabs a list používají stejné quiet primitives jako zbytek knihovny.
+  </p>
+
+  <div class="layout">
+    <div class="canvas">Obsah dne vlevo. Drawer je samostatný pravý panel, který může na mobilu přejít do plnošířkového overlay panelu.</div>
+
+    <aside class="glossary-drawer" aria-label="Slovník">
+      <header class="glossary-drawer__header">
+        <div>
+          <div class="ui-meta-label">Slovník</div>
+          <h2 class="glossary-drawer__title">Pojmy a definice</h2>
+        </div>
+        <button class="ui-icon-button" type="button" aria-label="Zavřít">×</button>
+      </header>
+
+      <div class="glossary-drawer__search">
+        <label class="ui-meta-label" for="glossary-search" style="display:block;margin-bottom:8px">Hledání</label>
+        <input class="ui-search-input" id="glossary-search" type="search" placeholder="Hledat pojem">
+      </div>
+
+      <nav class="glossary-drawer__tabs ui-segmented-tabs" aria-label="Výběr tieru">
+        <button class="is-active" type="button">Tier 1</button>
+        <button type="button">Tier 2</button>
+        <button type="button">Tier 3</button>
+        <button type="button">Tier 4</button>
+      </nav>
+
+      <div class="glossary-drawer__list" id="glossaryTerms">
+        <article class="glossary-term is-open" data-term="context window" data-tier="tier1">
+          <button class="glossary-term__trigger" type="button">
+            <span class="glossary-term__title">Context window</span>
+            <span class="glossary-term__chevron">⌄</span>
+          </button>
+          <div class="glossary-term__content">Maximální objem kontextu, který model udrží v jedné interakci bez ztráty návaznosti.</div>
+        </article>
+
+        <article class="glossary-term" data-term="system prompt" data-tier="tier1">
+          <button class="glossary-term__trigger" type="button">
+            <span class="glossary-term__title">System prompt</span>
+            <span class="glossary-term__chevron">⌄</span>
+          </button>
+          <div class="glossary-term__content">Nejvyšší instrukční vrstva určující roli modelu, mantinely a očekávané chování.</div>
+        </article>
+
+        <article class="glossary-term" data-term="few-shot prompting" data-tier="tier2">
+          <button class="glossary-term__trigger" type="button">
+            <span class="glossary-term__title">Few-shot prompting</span>
+            <span class="glossary-term__chevron">⌄</span>
+          </button>
+          <div class="glossary-term__content">Technika s několika ukázkami vstupu a výstupu, která modelu pomůže zachytit požadovaný vzor.</div>
+        </article>
+
+        <article class="glossary-term" data-term="skill" data-tier="tier3">
+          <button class="glossary-term__trigger" type="button">
+            <span class="glossary-term__title">Skill</span>
+            <span class="glossary-term__chevron">⌄</span>
+          </button>
+          <div class="glossary-term__content">Zabalená sada instrukcí a pomocných souborů, která rozšiřuje schopnosti agenta pro konkrétní workflow.</div>
+        </article>
+
+        <article class="glossary-term" data-term="mcp server" data-tier="tier4">
+          <button class="glossary-term__trigger" type="button">
+            <span class="glossary-term__title">MCP server</span>
+            <span class="glossary-term__chevron">⌄</span>
+          </button>
+          <div class="glossary-term__content">Server poskytující modelu standardizovaný přístup k nástrojům, datům nebo aplikačním funkcím.</div>
+        </article>
+
+        <div class="empty-state" id="emptyState">Pro zadaný dotaz nebo zvolený tier teď nevidím žádný pojem.</div>
+      </div>
+    </aside>
+  </div>
+</div>
+<script>
+const searchInput=document.getElementById('glossary-search');
+const list=document.getElementById('glossaryTerms');
+const emptyState=document.getElementById('emptyState');
+const tabs=document.querySelectorAll('.ui-segmented-tabs button');
+const items=[...list.querySelectorAll('.glossary-term')];
+let activeTier='tier1';
+
+function syncList(){
+  const query=searchInput.value.trim().toLowerCase();
+  let visibleCount=0;
+  items.forEach((item)=>{
+    const term=item.dataset.term;
+    const tier=item.dataset.tier;
+    const visible=tier===activeTier && term.includes(query);
+    item.style.display=visible?'block':'none';
+    if(visible) visibleCount+=1;
+  });
+  emptyState.style.display=visibleCount===0?'block':'none';
+}
+
+tabs.forEach((tab,index)=>{
+  tab.addEventListener('click',()=>{
+    tabs.forEach((button)=>button.classList.remove('is-active'));
+    tab.classList.add('is-active');
+    activeTier=`tier${index+1}`;
+    syncList();
+  });
+});
+
+items.forEach((item)=>{
+  const trigger=item.querySelector('.glossary-term__trigger');
+  trigger.addEventListener('click',()=>{
+    item.classList.toggle('is-open');
+  });
+});
+
+searchInput.addEventListener('input',syncList);
+syncList();
+</script>
+</body>
+</html>

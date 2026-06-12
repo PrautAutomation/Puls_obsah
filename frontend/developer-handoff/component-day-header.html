@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PULS — DayHeader komponenta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ═══ Design tokens z existující appky ═══ */
+        :root {
+            --slate-950: #0B0E14;
+            --slate-900: #11151D;
+            --slate-850: #161B26;
+            --slate-800: #1A1F2B;
+            --slate-700: #252B3A;
+
+            --glass-1: rgba(255, 255, 255, 0.04);
+            --glass-2: rgba(255, 255, 255, 0.06);
+            --glass-3: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-strong: rgba(255, 255, 255, 0.12);
+
+            --accent: #8D2AF3;
+            --accent-hover: #9D3FFF;
+            --accent-soft: rgba(141, 42, 243, 0.12);
+            --accent-glow: rgba(141, 42, 243, 0.25);
+
+            --text-primary: #F4F6FA;
+            --text-secondary: #B8C0D0;
+            --text-muted: #8B93A7;
+
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+
+            --activity-lesson: #3B82F6;
+            --activity-practice: #14B8A6;
+            --activity-exercise: #10B981;
+            --activity-reflection: #A78BFA;
+            --activity-project: #F59E0B;
+            --activity-live: #EF4444;
+
+            --font-primary: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-mono: 'IBM Plex Mono', 'Fira Code', monospace;
+
+            --space-1: 4px; --space-2: 8px; --space-3: 12px;
+            --space-4: 16px; --space-5: 20px; --space-6: 24px;
+            --space-8: 32px; --space-10: 40px;
+
+            --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
+            --radius-xl: 18px; --radius-full: 9999px;
+
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --glow-cta: 0 4px 16px var(--accent-glow);
+            --glow-hover: 0 6px 24px var(--accent-glow);
+        }
+
+        /* ═══ Reset ═══ */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font-primary);
+            background: var(--slate-950);
+            color: var(--text-secondary);
+            min-height: 100vh;
+            padding: var(--space-10);
+        }
+
+        /* ═══ Showcase wrapper ═══ */
+        .showcase {
+            max-width: 860px;
+            margin: 0 auto;
+        }
+        .showcase-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: var(--space-4);
+        }
+
+        /* ═══════════════════════════════════════════
+           KOMPONENTA: DayHeader
+           ═══════════════════════════════════════════ */
+
+        .day-header {
+            padding: var(--space-8) var(--space-8) var(--space-6);
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(141, 42, 243, 0.18);
+            background:
+                radial-gradient(ellipse 50% 55% at 85% 20%, rgba(141, 42, 243, 0.12), transparent 60%),
+                var(--glass-2);
+            display: grid;
+            gap: var(--space-5);
+        }
+
+        /* ── Top row: back + breadcrumb ── */
+        .day-header-top {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-primary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s var(--ease);
+        }
+        .btn-back:hover {
+            color: var(--text-primary);
+            background: var(--glass-3);
+        }
+        .btn-back svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+        .breadcrumb a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.15s var(--ease);
+        }
+        .breadcrumb a:hover {
+            color: var(--text-primary);
+        }
+        .breadcrumb-sep {
+            color: var(--text-muted);
+            opacity: 0.4;
+        }
+        .breadcrumb-current {
+            color: var(--text-secondary);
+        }
+
+        /* ── Main content area ── */
+        .day-header-main {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: var(--space-6);
+            align-items: start;
+        }
+
+        .day-header-content {
+            display: grid;
+            gap: var(--space-4);
+        }
+
+        /* Badge: type of day — dot carries the colour, text stays quiet (system rule: aktivita = tečka, ne pill) */
+        .day-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+        }
+        .day-type-badge .dot {
+            width: 8px;
+            height: 8px;
+            flex: 0 0 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+        }
+
+        /* Only the dot is coloured per activity type */
+        .day-type-badge.lesson .dot     { background: var(--activity-lesson); }
+        .day-type-badge.practice .dot   { background: var(--activity-practice); }
+        .day-type-badge.exercise .dot   { background: var(--activity-exercise); }
+        .day-type-badge.reflection .dot { background: var(--activity-reflection); }
+        .day-type-badge.project .dot    { background: var(--activity-project); }
+        .day-type-badge.live .dot       { background: var(--activity-live); }
+
+        /* Title */
+        .day-header h1 {
+            color: var(--text-primary);
+            font-size: clamp(1.4rem, 2.4vw, 1.85rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin: 0;
+        }
+
+        /* Meta row: time, XP, part */
+        .day-meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .day-meta-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            background: var(--glass-1);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+        .day-meta-tag svg {
+            width: 14px;
+            height: 14px;
+            opacity: 0.7;
+        }
+
+        /* XP badge (right side) — green system style (matches .biweekly-xp in the app) */
+        .day-xp-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(52, 211, 153, 0.34);
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--success);
+            white-space: nowrap;
+        }
+        .day-xp-badge svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* ═══ Spacer for multiple showcase items ═══ */
+        .showcase-gap {
+            height: var(--space-10);
+        }
+
+        /* ═══ Accessibility: visible focus + reduced motion ═══ */
+        .btn-back:focus-visible,
+        .breadcrumb a:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition: none !important; animation: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="showcase">
+    <div class="showcase-label">DayHeader — Tier 2 · Objevuj</div>
+
+    <div class="day-header">
+        <!-- Top: Back + Breadcrumb -->
+        <div class="day-header-top">
+            <button class="btn-back">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                Zpět
+            </button>
+            <nav class="breadcrumb">
+                <a href="#">Týden 1</a>
+                <span class="breadcrumb-sep">›</span>
+                <span class="breadcrumb-current">Den 1</span>
+            </nav>
+        </div>
+
+        <!-- Main: Content left, XP right -->
+        <div class="day-header-main">
+            <div class="day-header-content">
+                <div class="day-type-badge lesson">
+                    <span class="dot"></span>
+                    Objevuj
+                </div>
+
+                <h1>System prompty a XML strukturování</h1>
+
+                <div class="day-meta-row">
+                    <span class="day-meta-tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        ~3 h
+                    </span>
+                </div>
+            </div>
+
+            <div class="day-xp-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                +215 b
+            </div>
+        </div>
+    </div>
+
+    <div class="showcase-gap"></div>
+    <div class="showcase-label">DayHeader — Tier 3 · Trénuj + Tvoř</div>
+
+    <div class="day-header">
+        <div class="day-header-top">
+            <button class="btn-back">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                Zpět
+            </button>
+            <nav class="breadcrumb">
+                <a href="#">Týden 1</a>
+                <span class="breadcrumb-sep">›</span>
+                <span class="breadcrumb-current">Den 3</span>
+            </nav>
+        </div>
+
+        <div class="day-header-main">
+            <div class="day-header-content">
+                <div class="day-type-badge exercise">
+                    <span class="dot"></span>
+                    Trénuj + Tvoř
+                </div>
+
+                <h1>Claude Code — postav si nástroj</h1>
+
+                <div class="day-meta-row">
+                    <span class="day-meta-tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        ~3 h
+                    </span>
+                </div>
+            </div>
+
+            <div class="day-xp-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                +235 b
+            </div>
+        </div>
+    </div>
+
+    <div class="showcase-gap"></div>
+    <div class="showcase-label">DayHeader — Tier 1 · Společně (online hodina)</div>
+
+    <div class="day-header">
+        <div class="day-header-top">
+            <button class="btn-back">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                Zpět
+            </button>
+            <nav class="breadcrumb">
+                <a href="#">Týden 1</a>
+                <span class="breadcrumb-sep">›</span>
+                <span class="breadcrumb-current">Den 5</span>
+            </nav>
+        </div>
+
+        <div class="day-header-main">
+            <div class="day-header-content">
+                <div class="day-type-badge live">
+                    <span class="dot"></span>
+                    Společně
+                </div>
+
+                <h1>Online hodina + reflexe</h1>
+
+                <div class="day-meta-row">
+                    <span class="day-meta-tag">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                        ~2.5 h
+                    </span>
+                </div>
+            </div>
+
+            <div class="day-xp-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                +160 b
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

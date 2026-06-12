@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULS · Primitives</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-canvas:#0B0E14;
+  --color-surface-1:rgba(255,255,255,0.04);
+  --color-surface-2:rgba(255,255,255,0.06);
+  --color-surface-3:rgba(255,255,255,0.08);
+  --color-border-soft:rgba(255,255,255,0.08);
+  --color-border-strong:rgba(255,255,255,0.12);
+  --color-text-primary:#F4F6FA;
+  --color-text-secondary:#B8C0D0;
+  --color-text-muted:#8B93A7;
+  --color-accent:#8D2AF3;
+  --color-success:#10B981;
+  --color-success-bg:rgba(16,185,129,0.08);
+  --color-success-border:rgba(52,211,153,0.34);
+  --color-activity-lesson:#3B82F6;
+  --color-activity-practice:#14B8A6;
+  --color-activity-exercise:#10B981;
+  --color-activity-reflection:#A78BFA;
+  --color-activity-project:#F59E0B;
+  --color-activity-live:#EF4444;
+  --font-primary:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono','Fira Code',monospace;
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:20px;
+  --space-6:24px;
+  --space-8:32px;
+  --space-10:40px;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:14px;
+  --radius-full:9999px;
+  --ease-standard:cubic-bezier(0.4,0,0.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;
+  background:var(--color-canvas);
+  color:var(--color-text-secondary);
+  font-family:var(--font-primary);
+  padding:var(--space-10) var(--space-6);
+}
+.wrap{max-width:960px;margin:0 auto}
+.showcase-title{
+  color:var(--color-text-primary);
+  font-size:clamp(1.2rem,2.2vw,1.65rem);
+  font-weight:750;
+  margin-bottom:6px;
+}
+.showcase-sub{
+  max-width:70ch;
+  color:var(--color-text-muted);
+  font-size:0.84rem;
+  line-height:1.6;
+  margin-bottom:var(--space-8);
+}
+.group{margin-bottom:var(--space-10)}
+.group-label{
+  display:flex;
+  align-items:center;
+  gap:var(--space-2);
+  margin-bottom:var(--space-4);
+  color:var(--color-text-muted);
+  font-family:var(--font-mono);
+  font-size:0.66rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+}
+.group-label .dot{width:6px;height:6px;border-radius:50%;background:var(--color-accent)}
+.grid{display:grid;gap:var(--space-4)}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.ui-surface-card,
+.ui-surface-panel{
+  background:var(--color-surface-1);
+  border:1px solid var(--color-border-soft);
+}
+.ui-surface-card{border-radius:var(--radius-md);padding:var(--space-4)}
+.ui-surface-panel{border-radius:var(--radius-lg);padding:var(--space-5)}
+.ui-meta-label{
+  color:var(--color-text-muted);
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+}
+.ui-title-sm{
+  color:var(--color-text-primary);
+  font-size:0.84rem;
+  font-weight:700;
+  line-height:1.35;
+}
+.ui-body-sm{
+  color:var(--color-text-secondary);
+  font-size:0.8rem;
+  line-height:1.6;
+}
+.ui-xp-pill{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 8px;
+  border-radius:var(--radius-sm);
+  color:rgba(16,185,129,0.78);
+  background:rgba(16,185,129,0.04);
+  border:1px solid rgba(52,211,153,0.18);
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  font-weight:700;
+}
+.ui-activity-inline{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:var(--color-text-secondary);
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+}
+.ui-activity-dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  display:inline-block;
+}
+.ui-icon-button{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  border-radius:var(--radius-sm);
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--color-text-muted);
+}
+.ui-search-input{
+  width:100%;
+  min-height:40px;
+  border:1px solid var(--color-border-soft);
+  border-radius:var(--radius-md);
+  background:var(--color-surface-1);
+  color:var(--color-text-primary);
+  padding:0 12px;
+  font-size:0.84rem;
+}
+.ui-segmented-tabs{
+  display:flex;
+  gap:4px;
+  padding:4px;
+  background:var(--color-surface-1);
+  border:1px solid var(--color-border-soft);
+  border-radius:var(--radius-md);
+}
+.ui-segmented-tabs button{
+  border:0;
+  background:transparent;
+  color:var(--color-text-muted);
+  padding:8px 10px;
+  border-radius:var(--radius-sm);
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+}
+.ui-segmented-tabs .is-active{
+  background:var(--color-surface-2);
+  color:var(--color-text-primary);
+  border:1px solid rgba(255,255,255,0.1);
+}
+.token-list{display:grid;gap:10px}
+.token-row{
+  display:grid;
+  grid-template-columns:180px minmax(0,1fr) auto;
+  gap:var(--space-3);
+  align-items:center;
+  padding:10px 0;
+  border-bottom:1px solid var(--color-border-soft);
+}
+.token-row:last-child{border-bottom:0}
+.swatch{
+  width:48px;
+  height:24px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--color-border-soft);
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="showcase-title">PULS Primitives</h1>
+  <p class="showcase-sub">
+    Minimální stavebnice pro zbytek komponentové knihovny. Vývojář z těchto primitives skládá konkrétní komponenty
+    a z těch pak celé stránky. Cílem je držet jednotný surface pattern, textovou hierarchii a interaction rhythm.
+  </p>
+
+  <section class="group">
+    <div class="group-label"><span class="dot"></span>Tokens</div>
+    <div class="ui-surface-panel">
+      <div class="token-list">
+        <div class="token-row"><span class="ui-meta-label">Surface 1</span><span class="ui-body-sm">Hlavní glass surface pro karty a panely</span><span class="swatch" style="background:var(--color-surface-1)"></span></div>
+        <div class="token-row"><span class="ui-meta-label">Surface 2</span><span class="ui-body-sm">Hover nebo sekundární surface</span><span class="swatch" style="background:var(--color-surface-2)"></span></div>
+        <div class="token-row"><span class="ui-meta-label">Border Soft</span><span class="ui-body-sm">Základní border pro surface pattern</span><span class="swatch" style="background:var(--color-border-soft)"></span></div>
+        <div class="token-row"><span class="ui-meta-label">Text Primary</span><span class="ui-body-sm">Nadpisy a důležité texty</span><span class="swatch" style="background:var(--color-text-primary)"></span></div>
+        <div class="token-row"><span class="ui-meta-label">Success</span><span class="ui-body-sm">XP, drobné pozitivní stavy</span><span class="swatch" style="background:var(--color-success)"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="group">
+    <div class="group-label"><span class="dot"></span>Surfaces And Type</div>
+    <div class="grid two">
+      <div class="ui-surface-card">
+        <div class="ui-meta-label">Surface Card</div>
+        <h3 class="ui-title-sm" style="margin-top:8px;margin-bottom:8px">Malá karta</h3>
+        <p class="ui-body-sm">Základ pro TaskCard a kompaktní obsahové bloky.</p>
+      </div>
+      <div class="ui-surface-panel">
+        <div class="ui-meta-label">Surface Panel</div>
+        <h3 class="ui-title-sm" style="margin-top:8px;margin-bottom:8px">Větší panel</h3>
+        <p class="ui-body-sm">Základ pro sticky sidebary, drawery a větší navigační bloky.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="group">
+    <div class="group-label"><span class="dot"></span>Utility Elements</div>
+    <div class="grid">
+      <div class="ui-surface-panel" style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+        <span class="ui-xp-pill">+40 b</span>
+        <span class="ui-activity-inline"><span class="ui-activity-dot" style="background:var(--color-activity-practice)"></span>Practice</span>
+        <button class="ui-icon-button" type="button" aria-label="Zavřít">×</button>
+      </div>
+      <div class="ui-surface-panel" style="display:grid;gap:16px">
+        <input class="ui-search-input" type="search" placeholder="Hledat pojem">
+        <div class="ui-segmented-tabs">
+          <button class="is-active" type="button">Tier 1</button>
+          <button type="button">Tier 2</button>
+          <button type="button">Tier 3</button>
+          <button type="button">Tier 4</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>

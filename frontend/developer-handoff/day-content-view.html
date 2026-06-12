@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULS · Day Content View</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0E14;
+  --bg-soft:#11151D;
+  --glass-1:rgba(255,255,255,0.04);
+  --glass-2:rgba(255,255,255,0.06);
+  --glass-3:rgba(255,255,255,0.08);
+  --glass-border:rgba(255,255,255,0.08);
+  --glass-border-strong:rgba(255,255,255,0.12);
+  --text-primary:#F4F6FA;
+  --text-secondary:#B8C0D0;
+  --text-muted:#A4ACBE;
+  --accent:#8D2AF3;
+  --accent-hover:#9D3FFF;
+  --accent-soft:rgba(141,42,243,0.12);
+  --accent-glow:rgba(141,42,243,0.22);
+  --success:#10B981;
+  --success-bg:rgba(16,185,129,0.08);
+  --success-border:rgba(52,211,153,0.34);
+  --activity-lesson:#3B82F6;
+  --activity-practice:#14B8A6;
+  --activity-exercise:#10B981;
+  --activity-reflection:#A78BFA;
+  --activity-project:#F59E0B;
+  --activity-live:#EF4444;
+  --font-primary:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono','Fira Code',monospace;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --radius-lg:14px;
+  --radius-xl:18px;
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:20px;
+  --space-6:24px;
+  --space-8:32px;
+  --space-10:40px;
+  --ease:cubic-bezier(0.4,0,0.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%}
+body{
+  background:
+    radial-gradient(ellipse 55% 45% at 78% 16%, rgba(141,42,243,0.10), transparent 60%),
+    linear-gradient(180deg, rgba(141,42,243,0.04), transparent 22%),
+    var(--bg);
+  color:var(--text-secondary);
+  font-family:var(--font-primary);
+  line-height:1.6;
+  padding:32px 24px 80px;
+}
+.app{
+  max-width:1280px;
+  margin:0 auto;
+}
+
+/* Top shell */
+.top-shell{
+  position:relative;
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:center;
+  padding:18px 22px;
+  border-radius:18px;
+  background:var(--glass-1);
+  border:1px solid var(--glass-border);
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  box-shadow:0 8px 32px rgba(0,0,0,0.30);
+  margin-bottom:24px;
+}
+.top-shell::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.brand-logo{
+  width:44px;
+  height:44px;
+  border-radius:12px;
+  background:var(--accent);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-weight:800;
+  box-shadow:0 4px 16px var(--accent-glow);
+}
+.brand-copy small{
+  display:block;
+  color:var(--text-muted);
+  font-size:0.72rem;
+}
+.brand-copy strong{
+  color:var(--text-primary);
+  font-size:1rem;
+  font-weight:700;
+}
+.brand-copy strong .accent{
+  color:var(--accent-hover);
+}
+.header-meta{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.header-status{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:40px;
+  padding:0 12px;
+  border-radius:999px;
+  border:1px solid rgba(141,42,243,0.18);
+  background:linear-gradient(135deg,rgba(141,42,243,0.10),transparent 68%),var(--glass-1);
+  color:var(--text-secondary);
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  white-space:nowrap;
+}
+.header-status::before{
+  content:"";
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--success);
+  box-shadow:0 0 0 4px rgba(16,185,129,0.10);
+}
+.top-nav-cluster{
+  padding:4px;
+  border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));
+  border:1px solid rgba(255,255,255,0.06);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.top-nav{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 6px;
+  border-radius:999px;
+  background:var(--glass-1);
+  border:1px solid var(--glass-border);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+.top-nav button{
+  min-height:32px;
+  padding:6px 12px;
+  border-radius:999px;
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--text-secondary);
+  font:500 0.84rem var(--font-primary);
+  cursor:pointer;
+  transition:all 0.2s var(--ease);
+}
+.top-nav button:hover{
+  background:var(--glass-3);
+  color:var(--text-primary);
+}
+.top-nav button.active{
+  background:var(--glass-3);
+  color:var(--text-primary);
+  border-color:rgba(141,42,243,0.28);
+  box-shadow:inset 0 -2px 0 var(--accent);
+}
+
+/* Page shell */
+.page-shell{
+  border:1px solid var(--glass-border);
+  border-radius:18px;
+  background:var(--glass-1);
+  padding:24px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.22);
+}
+.page-label{
+  color:var(--text-muted);
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  margin-bottom:18px;
+}
+
+/* Day header */
+.day-header{
+  padding:28px 28px 24px;
+  border-radius:18px;
+  border:1px solid rgba(141,42,243,0.20);
+  background:
+    radial-gradient(ellipse 52% 60% at 84% 20%, rgba(141,42,243,0.12), transparent 60%),
+    var(--glass-2);
+  display:grid;
+  gap:20px;
+}
+.day-header-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+.breadcrumbs{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:var(--text-muted);
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+}
+.day-type{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  color:var(--text-secondary);
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  text-transform:uppercase;
+  letter-spacing:0.12em;
+}
+.day-type .dot{
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--activity-practice);
+}
+.day-header-main{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+  align-items:start;
+}
+.day-header h1{
+  color:var(--text-primary);
+  font-size:clamp(1.7rem,3vw,2.45rem);
+  line-height:1.08;
+  font-weight:800;
+  margin:10px 0 14px;
+}
+.day-header p{
+  max-width:62ch;
+  color:var(--text-secondary);
+  font-size:0.92rem;
+}
+.meta-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:18px;
+}
+.meta-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:6px 10px;
+  border-radius:var(--radius-sm);
+  background:var(--glass-1);
+  border:1px solid var(--glass-border);
+  color:var(--text-secondary);
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+}
+.hero-actions{
+  display:flex;
+  gap:12px;
+  margin-top:20px;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:48px;
+  padding:0 18px;
+  border-radius:12px;
+  border:1px solid var(--glass-border);
+  font-size:0.9rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s var(--ease);
+}
+.btn-primary{
+  background:var(--accent);
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 4px 16px var(--accent-glow);
+}
+.btn-primary:hover{
+  background:var(--accent-hover);
+  transform:translateY(-1px);
+  box-shadow:0 6px 24px var(--accent-glow);
+}
+.btn-secondary{
+  background:var(--glass-2);
+  color:var(--text-primary);
+}
+.btn-secondary:hover{
+  background:var(--glass-3);
+  border-color:var(--glass-border-strong);
+}
+/* Layout */
+.content-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 320px;
+  gap:24px;
+  margin-top:24px;
+  align-items:start;
+}
+.main-column{
+  display:grid;
+  gap:18px;
+}
+.sidebar{
+  position:sticky;
+  top:24px;
+  display:grid;
+  gap:16px;
+}
+
+/* Shared surfaces */
+.surface-card,.surface-panel{
+  background:var(--glass-1);
+  border:1px solid var(--glass-border);
+  transition:background 0.2s var(--ease),border-color 0.2s var(--ease),transform 0.2s var(--ease),box-shadow 0.2s var(--ease);
+}
+.surface-card:hover,.surface-panel:hover{
+  background:var(--glass-2);
+  border-color:var(--glass-border-strong);
+  transform:translateY(-1px);
+}
+.surface-card{border-radius:var(--radius-md);padding:16px}
+.surface-panel{border-radius:var(--radius-lg);padding:20px}
+
+/* Task card */
+.task-card__meta,.panel-label{
+  color:var(--text-muted);
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+}
+.task-card__title{
+  color:var(--text-primary);
+  font-size:0.94rem;
+  font-weight:700;
+  line-height:1.35;
+  margin:10px 0 8px;
+}
+.task-card__body{
+  color:var(--text-secondary);
+  font-size:0.82rem;
+  line-height:1.6;
+}
+.task-card__body p + p{margin-top:10px}
+.task-card__list{
+  list-style:none;
+  display:grid;
+  gap:6px;
+  margin-top:12px;
+}
+.task-card__list li{
+  position:relative;
+  padding-left:16px;
+}
+.task-card__list li::before{
+  content:"";
+  position:absolute;
+  left:2px;
+  top:0.62em;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background:var(--accent);
+}
+.task-card__code{
+  margin-top:14px;
+  background:var(--glass-2);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius-md);
+  overflow:hidden;
+}
+.task-card__code-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 12px;
+  border-bottom:1px solid var(--glass-border);
+}
+.task-card__code pre{
+  padding:12px;
+  color:var(--text-secondary);
+  font-family:var(--font-mono);
+  font-size:0.76rem;
+  line-height:1.6;
+  white-space:pre-wrap;
+}
+.completion-bridge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  width:max-content;
+  align-self:center;
+  min-height:32px;
+  padding:0 12px;
+  border-radius:999px;
+  border:1px solid rgba(141,42,243,0.22);
+  background:linear-gradient(135deg,rgba(141,42,243,0.14),transparent 78%),var(--glass-1);
+  color:var(--text-primary);
+  font-family:var(--font-mono);
+  font-size:0.7rem;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  box-shadow:0 0 0 1px rgba(141,42,243,0.06),0 10px 24px rgba(141,42,243,0.10);
+}
+.completion-bridge::before{
+  content:"";
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 0 4px rgba(141,42,243,0.10);
+}
+
+/* Quest panel */
+.quest-panel-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:12px;
+}
+.quest-panel-count{
+  color:var(--text-muted);
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+}
+.quest-list{display:grid;gap:6px}
+.quest-row{
+  display:grid;
+  grid-template-columns:18px minmax(0,1fr) auto;
+  gap:12px;
+  align-items:center;
+  padding:10px 12px;
+  border:1px solid transparent;
+  border-radius:10px;
+  cursor:pointer;
+  transition:background 0.2s var(--ease),border-color 0.2s var(--ease),transform 0.2s var(--ease);
+}
+.quest-row:hover{
+  background:var(--glass-2);
+  border-color:var(--glass-border-strong);
+  transform:translateY(-1px);
+}
+.quest-row.is-done{
+  background:var(--success-bg);
+  border-color:rgba(52,211,153,0.2);
+}
+.quest-row input{
+  appearance:none;
+  width:18px;
+  height:18px;
+  border-radius:4px;
+  border:1.5px solid var(--glass-border-strong);
+  background:transparent;
+  position:relative;
+  cursor:pointer;
+}
+.quest-row input:checked{
+  background:var(--success);
+  border-color:var(--success);
+}
+.quest-row input:checked::after{
+  content:"✓";
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  color:#052e1d;
+  font-size:12px;
+  font-weight:800;
+}
+.quest-title{
+  color:var(--text-primary);
+  font-size:0.84rem;
+  font-weight:600;
+  line-height:1.35;
+}
+.xp-pill{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 8px;
+  border-radius:var(--radius-sm);
+  border:1px solid rgba(52,211,153,0.18);
+  background:rgba(16,185,129,0.04);
+  color:rgba(16,185,129,0.78);
+  font-family:var(--font-mono);
+  font-size:0.72rem;
+  font-weight:700;
+}
+.quest-row.is-done .xp-pill{
+  border-color:var(--success-border);
+  background:var(--success-bg);
+  color:var(--success);
+}
+
+/* Supporting panels */
+.habit-row,.resource-row{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.habit-row:last-child,.resource-row:last-child{border-bottom:0}
+.habit-row strong,.resource-row strong{
+  color:var(--text-primary);
+  font-size:0.84rem;
+}
+.habit-row span,.resource-row span{
+  color:var(--text-muted);
+  font-size:0.8rem;
+}
+.empty-progress{
+  margin-top:10px;
+  padding:14px;
+  border-radius:var(--radius-md);
+  background:rgba(255,255,255,0.025);
+  border:1px solid rgba(255,255,255,0.06);
+}
+.empty-progress strong{
+  display:block;
+  color:var(--text-primary);
+  font-size:0.84rem;
+  margin-bottom:6px;
+}
+.empty-progress p{
+  color:var(--text-secondary);
+  font-size:0.8rem;
+  line-height:1.55;
+}
+
+/* Glossary drawer */
+.drawer-toggle{
+  width:100%;
+  justify-content:space-between;
+}
+.drawer-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(2,4,12,0.54);
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+  opacity:0;
+  visibility:hidden;
+  transition:opacity 0.2s var(--ease),visibility 0.2s var(--ease);
+}
+.drawer-overlay.is-open{
+  opacity:1;
+  visibility:visible;
+}
+.glossary-drawer{
+  position:fixed;
+  top:24px;
+  right:24px;
+  bottom:24px;
+  width:min(420px,calc(100vw - 32px));
+  display:grid;
+  grid-template-rows:auto auto auto minmax(0,1fr);
+  background:var(--glass-1);
+  border:1px solid var(--glass-border);
+  border-radius:18px;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  box-shadow:0 24px 80px rgba(0,0,0,0.34);
+  transform:translateX(110%);
+  transition:transform 0.24s var(--ease);
+}
+.drawer-overlay.is-open .glossary-drawer{
+  transform:translateX(0);
+}
+.drawer-header{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  padding:20px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.drawer-header h2{
+  color:var(--text-primary);
+  font-size:0.98rem;
+  font-weight:700;
+  margin-top:6px;
+}
+.icon-btn{
+  width:32px;
+  height:32px;
+  border-radius:var(--radius-sm);
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--text-muted);
+  cursor:pointer;
+  transition:background 0.15s var(--ease),border-color 0.15s var(--ease),color 0.15s var(--ease);
+}
+.icon-btn:hover{
+  background:var(--glass-2);
+  border-color:var(--glass-border);
+  color:var(--text-primary);
+}
+.drawer-block{
+  padding:16px 20px 0;
+}
+.search-input{
+  width:100%;
+  min-height:40px;
+  border-radius:var(--radius-md);
+  border:1px solid var(--glass-border);
+  background:var(--glass-1);
+  color:var(--text-primary);
+  padding:0 12px;
+  font-size:0.84rem;
+}
+.tabs{
+  display:flex;
+  gap:4px;
+  padding:4px;
+  border-radius:var(--radius-md);
+  background:var(--glass-1);
+  border:1px solid var(--glass-border);
+}
+.tabs button{
+  border:0;
+  background:transparent;
+  color:var(--text-muted);
+  padding:8px 10px;
+  border-radius:var(--radius-sm);
+  font-family:var(--font-mono);
+  font-size:0.68rem;
+  cursor:pointer;
+}
+.tabs button.active{
+  background:var(--glass-3);
+  color:var(--text-primary);
+  border:1px solid rgba(141,42,243,0.28);
+  box-shadow:inset 0 -2px 0 var(--accent);
+}
+.drawer-list{
+  padding:16px 20px 20px;
+  overflow:auto;
+}
+.glossary-term{
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.glossary-term:last-child{border-bottom:0}
+.glossary-trigger{
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  padding:14px 0;
+  background:transparent;
+  border:0;
+  text-align:left;
+  color:inherit;
+  cursor:pointer;
+}
+.glossary-trigger:hover .glossary-title{color:var(--text-primary)}
+.glossary-title{
+  color:var(--text-primary);
+  font-size:0.84rem;
+  font-weight:650;
+}
+.glossary-content{
+  display:none;
+  padding:0 0 14px;
+  color:var(--text-secondary);
+  font-size:0.8rem;
+  line-height:1.6;
+}
+.glossary-term.is-open .glossary-content{display:block}
+
+/* Inline helper strip */
+.helper-strip{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:16px;
+}
+.helper-chip{
+  padding:8px 10px;
+  border-radius:var(--radius-sm);
+  background:var(--glass-1);
+  border:1px solid var(--glass-border);
+  color:var(--text-secondary);
+  font-size:0.78rem;
+}
+.helper-chip strong{
+  color:var(--text-primary);
+  font-size:0.76rem;
+}
+
+@media(max-width:1040px){
+  .day-header-main{grid-template-columns:1fr}
+  .content-grid{grid-template-columns:1fr}
+  .sidebar{position:static}
+}
+@media(max-width:760px){
+  body{padding:20px 14px 60px}
+  .top-shell{flex-direction:column;align-items:flex-start}
+  .header-meta{width:100%;flex-direction:column;align-items:stretch}
+  .header-status{justify-content:center}
+  .top-nav-cluster{width:100%}
+  .top-nav{flex-wrap:wrap}
+  .hero-actions{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top-shell">
+    <div class="brand">
+      <div class="brand-logo">P</div>
+      <div class="brand-copy">
+        <small>PULS</small>
+        <strong>Claude <span class="accent">planner</span></strong>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="header-status">Focus mode · dnes aktivní</div>
+      <div class="top-nav-cluster">
+        <nav class="top-nav" aria-label="Hlavní navigace">
+          <button>Planner</button>
+          <button class="active">Studium</button>
+          <button>Meets</button>
+          <button>Profil</button>
+          <button>Odhlásit</button>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <div class="page-label">Studium · Detail dne</div>
+
+    <section class="day-header">
+      <div class="day-header-top">
+        <div class="breadcrumbs">Tier 1 / Foundation</div>
+        <div class="day-type"><span class="dot"></span>Objevuj</div>
+      </div>
+
+      <div class="day-header-main">
+        <div>
+          <h1>Začínáme s Claudem</h1>
+          <p>Dnes uděláš první reálnou interakci s Claudem, projdeš si základní pravidla práce a sepíšeš vlastní manifest, kde ti má dlouhodobě pomáhat.</p>
+
+          <div class="meta-row">
+            <span class="meta-tag">~3 h</span>
+            <span class="meta-tag">5 questů dne</span>
+            <span class="meta-tag">Výstup: manifest + 1 situace dotažená do konce</span>
+          </div>
+
+          <div class="hero-actions">
+            <button class="btn btn-primary">Otevřít Claude</button>
+            <button class="btn btn-secondary">Otevřít příručku</button>
+            <button class="btn btn-secondary" id="openDrawer">Otevřít slovník</button>
+          </div>
+
+          <div class="helper-strip">
+            <span class="helper-chip"><strong>Kompas:</strong> 4 otázky pro práci s Claudem</span>
+            <span class="helper-chip"><strong>Pozor:</strong> citlivá data vždy anonymizovat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="content-grid">
+      <section class="main-column">
+        <article class="surface-card">
+          <span class="task-card__meta">Úkol 01</span>
+          <h2 class="task-card__title">Zkus první reálný úkol a sleduj, co se změní po upřesnění</h2>
+          <div class="task-card__body">
+            <p>Než začneš přemýšlet o pravidlech, prostě to zkus. Napiš Claudovi, čím se živíš a co tě v práci zrovna trápí. Klidně tak, jak bys to řekla kolegovi u kafe. Cílem je vidět první výsledek bez zbytečné teorie navíc.</p>
+            <p>Pak odpověď vědomě uprav: chtěj kratší verzi, jiný tón, konkrétnější formulaci nebo jiný formát. Tím si hned osaháš, proč v práci s Claudem rozhoduje kontext, konkrétnost a iterace.</p>
+          </div>
+        </article>
+
+        <article class="surface-card">
+          <span class="task-card__meta">Úkol 02</span>
+          <h2 class="task-card__title">Napiš osobní manifest „Proč Claude“</h2>
+          <div class="task-card__body">
+            <p>Řekni Claudovi o své práci a nech ho navrhnout, kde by ti mohl pomáhat. Projdi jeho návrhy, vyber to, co na tebe sedí, a doplň vlastní konkrétní situace. Výsledkem má být krátký text vlastními slovy, ne cizí generický odstavec.</p>
+            <p>Manifest má odpovědět aspoň na tři věci: proč chceš Claude používat, kde konkrétně ti pomůže a jaké situace z práce tím zlepšíš.</p>
+            <ul class="task-card__list">
+              <li>Proč chci Claude používat?</li>
+              <li>Kde konkrétně mi pomůže?</li>
+              <li>Jaké 3+ situace z mé práce tím zlepším?</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="surface-card">
+          <span class="task-card__meta">Úkol 03</span>
+          <h2 class="task-card__title">Vyzkoušej jednu situaci naplno a projdi ji přes 4 otázky</h2>
+          <div class="task-card__body">
+            <p>Vyber jednu situaci z manifestu a dotáhni ji s Claudem od začátku do konce. Dej kontext, řekni formát výstupu a nespokoj se s první verzí. Na konci si zapiš, co fungovalo a co příště uděláš jinak.</p>
+            <p>Jako kontrolu použij čtyři otázky, které se budou vracet celým kurzem. Nejde o teorii navíc, ale o jednoduchý pracovní kompas pro každé další použití.</p>
+          </div>
+          <div class="task-card__code">
+            <div class="task-card__code-head">
+              <span class="panel-label">4 otázky</span>
+              <button class="icon-btn" type="button" aria-label="Kopírovat">⧉</button>
+            </div>
+            <pre>1. Co jsem mu dal?
+2. Jak jsem to popsal?
+3. Bylo to dobré?
+4. Chtěl jsem to lepší?</pre>
+          </div>
+        </article>
+
+        <div class="completion-bridge">Dnešek je hotový, když máš</div>
+
+        <section class="surface-panel">
+          <div class="task-card__body">
+            <ul class="task-card__list">
+              <li>účet na claude.ai a základní orientaci v prostředí</li>
+              <li>hotový osobní manifest „Proč Claude“</li>
+              <li>jednu konkrétní situaci, kde víš, jak Claude použiješ</li>
+              <li>jasno v tom, proč Claude není jen „chat“ a kdy anonymizovat data</li>
+            </ul>
+          </div>
+        </section>
+      </section>
+
+      <aside class="sidebar">
+        <section class="surface-panel">
+          <div class="quest-panel-head">
+            <span class="panel-label">Questy dne</span>
+            <span class="quest-panel-count" id="questCount">2 / 5</span>
+          </div>
+          <div class="quest-list" id="questList">
+            <label class="quest-row">
+              <input type="checkbox">
+              <span class="quest-title">Vytvořit účet na claude.ai a zorientovat se</span>
+              <span class="xp-pill">+20 b</span>
+            </label>
+            <label class="quest-row is-done">
+              <input type="checkbox" checked>
+              <span class="quest-title">Zadat první reálný úkol a vidět výsledek</span>
+              <span class="xp-pill">+40 b</span>
+            </label>
+            <label class="quest-row">
+              <input type="checkbox">
+              <span class="quest-title">Přečíst příručku</span>
+              <span class="xp-pill">+30 b</span>
+            </label>
+            <label class="quest-row is-done">
+              <input type="checkbox" checked>
+              <span class="quest-title">Napsat manifest „Proč Claude“</span>
+              <span class="xp-pill">+60 b</span>
+            </label>
+            <label class="quest-row">
+              <input type="checkbox">
+              <span class="quest-title">Dokončit situaci od A do Z</span>
+              <span class="xp-pill">+50 b</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="surface-panel">
+          <div class="panel-label">Dnešní habits</div>
+          <div class="habit-row" style="margin-top:10px">
+            <strong>Ranní zamyšlení s Claudem</strong>
+            <span>daily · +10 b</span>
+          </div>
+          <div class="habit-row">
+            <strong>Týdenní reflexe</strong>
+            <span>weekly · +30 b</span>
+          </div>
+        </section>
+
+        <section class="surface-panel">
+          <div class="panel-label">Předešlé lekce a pokrok</div>
+          <div class="empty-progress">
+            <strong>Dnes začínáš.</strong>
+            <p>Proto tu ještě nejsou žádné splněné dny ani předchozí lekce. Zítra tady uvidíš svůj první pokrok, navazující den a postupně i přehled toho, co už máš za sebou.</p>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<div class="drawer-overlay" id="drawerOverlay" aria-hidden="true">
+  <aside class="glossary-drawer" aria-label="Slovník">
+    <header class="drawer-header">
+      <div>
+        <div class="panel-label">Slovník</div>
+        <h2>Pojmy a definice</h2>
+      </div>
+      <button class="icon-btn" id="closeDrawer" type="button" aria-label="Zavřít">×</button>
+    </header>
+
+    <div class="drawer-block">
+      <input class="search-input" type="search" placeholder="Hledat pojem">
+    </div>
+
+    <div class="drawer-block">
+      <div class="tabs">
+        <button class="active" type="button">Tier 1</button>
+        <button type="button">Tier 2</button>
+        <button type="button">Tier 3</button>
+        <button type="button">Tier 4</button>
+      </div>
+    </div>
+
+    <div class="drawer-list">
+      <article class="glossary-term is-open">
+        <button class="glossary-trigger" type="button">
+          <span class="glossary-title">Context window</span>
+          <span style="color:var(--text-muted)">⌃</span>
+        </button>
+        <div class="glossary-content">Maximální objem kontextu, který model udrží v jedné interakci bez ztráty návaznosti.</div>
+      </article>
+
+      <article class="glossary-term">
+        <button class="glossary-trigger" type="button">
+          <span class="glossary-title">System prompt</span>
+          <span style="color:var(--text-muted)">⌄</span>
+        </button>
+        <div class="glossary-content">Nejvyšší instrukční vrstva určující roli modelu, mantinely a očekávané chování.</div>
+      </article>
+
+      <article class="glossary-term">
+        <button class="glossary-trigger" type="button">
+          <span class="glossary-title">Few-shot prompting</span>
+          <span style="color:var(--text-muted)">⌄</span>
+        </button>
+        <div class="glossary-content">Technika, kdy modelu ukážeš několik příkladů vstupu a výstupu, aby se chytil požadovaného vzoru.</div>
+      </article>
+    </div>
+  </aside>
+</div>
+
+<script>
+const drawerOverlay=document.getElementById('drawerOverlay');
+const openButtons=[document.getElementById('openDrawer'),document.getElementById('openDrawerSecondary')];
+const closeDrawer=document.getElementById('closeDrawer');
+
+openButtons.forEach((button)=>{
+  button.addEventListener('click',()=>{
+    drawerOverlay.classList.add('is-open');
+    drawerOverlay.setAttribute('aria-hidden','false');
+  });
+});
+
+closeDrawer.addEventListener('click',()=>{
+  drawerOverlay.classList.remove('is-open');
+  drawerOverlay.setAttribute('aria-hidden','true');
+});
+
+drawerOverlay.addEventListener('click',(event)=>{
+  if(event.target===drawerOverlay){
+    drawerOverlay.classList.remove('is-open');
+    drawerOverlay.setAttribute('aria-hidden','true');
+  }
+});
+
+document.querySelectorAll('.glossary-trigger').forEach((button)=>{
+  button.addEventListener('click',()=>{
+    button.parentElement.classList.toggle('is-open');
+  });
+});
+
+const questList=document.getElementById('questList');
+const questCount=document.getElementById('questCount');
+function syncQuestCount(){
+  const total=questList.querySelectorAll('.quest-row').length;
+  const done=questList.querySelectorAll('input:checked').length;
+  questCount.textContent=`${done} / ${total}`;
+}
+questList.querySelectorAll('.quest-row').forEach((row)=>{
+  const input=row.querySelector('input');
+  input.addEventListener('change',()=>{
+    row.classList.toggle('is-done',input.checked);
+    syncQuestCount();
+  });
+});
+syncQuestCount();
+</script>
+</body>
+</html>
