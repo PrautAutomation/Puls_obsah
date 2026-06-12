@@ -17,8 +17,27 @@
   --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:18px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--color-canvas);color:var(--text-secondary);font-family:var(--font-primary);line-height:1.6;padding:40px 24px 90px}
-.wrap{max-width:1240px;margin:0 auto}
+html{scroll-behavior:smooth}
+body{background:var(--color-canvas);color:var(--text-secondary);font-family:var(--font-primary);line-height:1.6;padding:40px 24px 90px;overflow-x:hidden}
+.wrap{max-width:1240px;margin:0 auto;transition:filter .24s ease}
+body.is-wave-active .wrap{filter:saturate(1.08) contrast(1.03)}
+.click-wave-layer{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;contain:strict}
+.click-wave{
+  position:absolute;left:var(--wave-x);top:var(--wave-y);width:2px;height:2px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.42) 0,rgba(141,42,243,.30) 34%,rgba(141,42,243,.08) 62%,transparent 72%);
+  border:1px solid rgba(255,255,255,.26);box-shadow:0 0 36px rgba(141,42,243,.28);
+  opacity:.9;transform:translate(-50%,-50%) scale(0);will-change:transform,opacity;
+  animation:clickWave .42s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes clickWave{
+  0%{opacity:.88;transform:translate(-50%,-50%) scale(0)}
+  62%{opacity:.34}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(var(--wave-scale))}
+}
+.is-ripple-source{
+  outline:1px solid rgba(141,42,243,.52);outline-offset:2px;
+  box-shadow:0 0 0 1px rgba(141,42,243,.12),0 0 28px rgba(141,42,243,.20);
+}
 .hero{margin-bottom:34px}
 .eyebrow,.section-label{display:inline-flex;align-items:center;gap:8px;color:var(--text-muted);font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase}
 .eyebrow::before,.section-label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
@@ -27,6 +46,7 @@ h1{color:var(--text-primary);font-size:clamp(1.45rem,2.8vw,2.25rem);line-height:
 .toc,.link-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .toc a,.link-row a{color:var(--text-secondary);text-decoration:none;font-family:var(--font-mono);font-size:.72rem;padding:8px 10px;border-radius:var(--radius-sm);background:var(--glass-1);border:1px solid var(--glass-border);transition:background .2s,border-color .2s,color .2s}
 .toc a:hover,.link-row a:hover{background:var(--glass-2);border-color:var(--glass-border-strong);color:var(--text-primary)}
+body.is-wave-active .toc a,body.is-wave-active .link-row a{border-color:rgba(141,42,243,.24)}
 .section{margin-top:42px}
 .section-head{margin-bottom:18px}
 .section-title{color:var(--text-primary);font-size:1.06rem;font-weight:700;margin-top:8px}
@@ -44,6 +64,15 @@ h1{color:var(--text-primary);font-size:clamp(1.45rem,2.8vw,2.25rem);line-height:
   background:var(--glass-2);
   border-color:var(--glass-border-strong);
   transform:translateY(-1px);
+}
+.card.is-selected,.panel.is-selected{
+  background:linear-gradient(135deg,rgba(141,42,243,.12),transparent 62%),var(--glass-2);
+  border-color:rgba(141,42,243,.34);
+  box-shadow:0 0 0 1px rgba(141,42,243,.08),0 18px 54px rgba(141,42,243,.10);
+}
+body.is-wave-active .card,body.is-wave-active .panel{
+  border-color:rgba(141,42,243,.22);
+  box-shadow:0 0 0 1px rgba(141,42,243,.05);
 }
 .card{border-radius:var(--radius-md);padding:16px}
 .panel{border-radius:var(--radius-lg);padding:20px}
@@ -75,17 +104,22 @@ h1{color:var(--text-primary);font-size:clamp(1.45rem,2.8vw,2.25rem);line-height:
 }
 .pill-nav span{
   min-height:32px;padding:6px 12px;border-radius:999px;color:var(--text-secondary);font:500 .84rem var(--font-primary);
-  border:1px solid transparent;transition:background .2s,border-color .2s,color .2s
+  border:1px solid transparent;transition:background .2s,border-color .2s,color .2s,box-shadow .2s
 }
 .pill-nav span:hover{background:var(--glass-3);color:var(--text-primary)}
 .pill-nav .active{color:var(--text-primary);background:var(--glass-3);border:1px solid rgba(141,42,243,0.28);box-shadow:inset 0 -2px 0 var(--accent)}
+.pill-nav span.is-selected{color:var(--text-primary);background:rgba(141,42,243,.13);border-color:rgba(141,42,243,.38);box-shadow:inset 0 -2px 0 var(--accent),0 0 22px rgba(141,42,243,.14)}
 .donut{width:120px;height:120px;border-radius:50%;border:10px solid rgba(255,255,255,0.09);display:grid;place-items:center;position:relative}
 .donut::after{content:"";position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:var(--success)}
 .donut strong{color:var(--text-primary);font-size:2rem;line-height:1}
 .checklist-row{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:14px;align-items:start;padding:14px 12px;border:1px solid transparent;border-radius:10px;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
 .checklist-row:hover{background:var(--glass-2);border-color:var(--glass-border-strong);transform:translateY(-1px)}
 .checklist-row + .checklist-row{margin-top:6px}
-.box{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.22);margin-top:4px}
+.checklist-row.is-done{background:var(--success-bg);border-color:rgba(52,211,153,.2)}
+.box{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.22);margin-top:4px;transition:background .2s,border-color .2s}
+.checklist-row.is-done .box{background:var(--success);border-color:var(--success);position:relative}
+.checklist-row.is-done .box::after{content:"✓";position:absolute;inset:-2px;display:grid;place-items:center;color:#052e1d;font-size:10px;font-weight:800}
+.checklist-row.is-done .token{color:var(--success);background:var(--success-bg);border-color:var(--success-border)}
 .check-title{color:var(--text-primary);font-size:.95rem;font-weight:650;line-height:1.3}
 .check-sub{color:var(--text-secondary);font-size:.82rem;line-height:1.35;margin-top:2px}
 .quest-row{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid transparent;border-radius:10px;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
@@ -94,8 +128,18 @@ h1{color:var(--text-primary);font-size:clamp(1.45rem,2.8vw,2.25rem);line-height:
 .quest-row.is-done{background:var(--success-bg);border-color:rgba(52,211,153,0.2)}
 .quest-row.is-done .quest-row__box{background:var(--success);border-color:var(--success);position:relative}
 .quest-row.is-done .quest-row__box::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#052e1d;font-size:12px;font-weight:800}
+.quest-row.is-done .token{color:var(--success);background:var(--success-bg);border-color:var(--success-border)}
 .quest-row__title{color:var(--text-primary);font-size:.84rem;font-weight:600;line-height:1.35}
 .day-tile{min-height:190px}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .wrap{transition:none}
+  .click-wave{width:88px;height:88px;animation:clickWaveReduced .22s ease-out forwards}
+  @keyframes clickWaveReduced{
+    0%{opacity:.28;transform:translate(-50%,-50%) scale(.72)}
+    100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
+  }
+}
 @media(max-width:1020px){.grid.two,.grid.three,.metric-row,.metric-row.five{grid-template-columns:1fr}}
 </style>
 </head>
@@ -378,5 +422,158 @@ h1{color:var(--text-primary);font-size:clamp(1.45rem,2.8vw,2.25rem);line-height:
     </div>
   </section>
 </div>
+<script>
+(() => {
+  const CLICKABLE_SELECTOR = 'a,button,input,select,textarea,[role="button"],[tabindex],.quest-row,.checklist-row,.card,.panel,.pill-nav span';
+  const WAVE_MS = 420;
+  const SELECTED_MS = 700;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let waveLayer = document.querySelector('.click-wave-layer');
+  let activeWave = null;
+  let waveTimer = 0;
+  let sourceTimer = 0;
+  let selectedTimer = 0;
+  let navigationTimer = 0;
+  let rippleSource = null;
+  let selectedSurface = null;
+
+  if (!waveLayer) {
+    waveLayer = document.createElement('div');
+    waveLayer.className = 'click-wave-layer';
+    waveLayer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(waveLayer);
+  }
+
+  const clearWaveState = () => {
+    document.body.classList.remove('is-wave-active');
+    if (activeWave) {
+      activeWave.remove();
+      activeWave = null;
+    }
+  };
+
+  const getWaveScale = (x, y) => {
+    if (reducedMotion.matches) return 1;
+    const maxX = Math.max(x, window.innerWidth - x);
+    const maxY = Math.max(y, window.innerHeight - y);
+    return Math.ceil(Math.hypot(maxX, maxY));
+  };
+
+  const startWave = (x, y) => {
+    window.clearTimeout(waveTimer);
+    clearWaveState();
+
+    const wave = document.createElement('span');
+    wave.className = 'click-wave';
+    wave.style.setProperty('--wave-x', `${x}px`);
+    wave.style.setProperty('--wave-y', `${y}px`);
+    wave.style.setProperty('--wave-scale', getWaveScale(x, y));
+    waveLayer.appendChild(wave);
+    activeWave = wave;
+    document.body.classList.add('is-wave-active');
+
+    waveTimer = window.setTimeout(clearWaveState, reducedMotion.matches ? 240 : WAVE_MS);
+  };
+
+  const markRippleSource = (target) => {
+    if (rippleSource) rippleSource.classList.remove('is-ripple-source');
+    window.clearTimeout(sourceTimer);
+    rippleSource = target;
+    rippleSource.classList.add('is-ripple-source');
+    sourceTimer = window.setTimeout(() => {
+      rippleSource.classList.remove('is-ripple-source');
+      rippleSource = null;
+    }, reducedMotion.matches ? 260 : 520);
+  };
+
+  const pulseSelected = (target) => {
+    if (!target) return;
+    if (selectedSurface) selectedSurface.classList.remove('is-selected');
+    window.clearTimeout(selectedTimer);
+    selectedSurface = target;
+    selectedSurface.classList.add('is-selected');
+    selectedTimer = window.setTimeout(() => {
+      selectedSurface.classList.remove('is-selected');
+      selectedSurface = null;
+    }, reducedMotion.matches ? 300 : SELECTED_MS);
+  };
+
+  const toggleDoneAfterWave = (target) => {
+    window.setTimeout(() => target.classList.toggle('is-done'), reducedMotion.matches ? 160 : WAVE_MS);
+  };
+
+  const applyContextTransform = (target) => {
+    const questRow = target.closest('.quest-row');
+    if (questRow) {
+      toggleDoneAfterWave(questRow);
+      return;
+    }
+
+    const checklistRow = target.closest('.checklist-row');
+    if (checklistRow) {
+      toggleDoneAfterWave(checklistRow);
+      return;
+    }
+
+    const pillItem = target.matches('.pill-nav span') ? target : target.closest('.pill-nav span');
+    if (pillItem) {
+      const nav = pillItem.closest('.pill-nav');
+      nav.querySelectorAll('span').forEach((item) => item.classList.toggle('active', item === pillItem));
+      pulseSelected(pillItem);
+      return;
+    }
+
+    pulseSelected(target.closest('.card,.panel'));
+  };
+
+  const decodeHash = (hash) => {
+    try {
+      return decodeURIComponent(hash.slice(1));
+    } catch {
+      return hash.slice(1);
+    }
+  };
+
+  const followLink = (link) => {
+    const rawHref = link.getAttribute('href');
+    if (!rawHref || rawHref === '#') return;
+
+    const url = new URL(link.href, window.location.href);
+    const sameDocument = url.pathname === window.location.pathname && url.search === window.location.search;
+
+    if (url.hash && sameDocument) {
+      const hashTarget = document.getElementById(decodeHash(url.hash)) || document.getElementsByName(decodeHash(url.hash))[0];
+      if (hashTarget) {
+        hashTarget.scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'start' });
+        history.pushState(null, '', url.hash);
+        return;
+      }
+    }
+
+    window.location.href = link.href;
+  };
+
+  document.addEventListener('click', (event) => {
+    if (event.button !== 0) return;
+
+    const target = event.target.closest(CLICKABLE_SELECTOR);
+    if (!target || !document.body.contains(target) || target.closest('.click-wave-layer')) return;
+
+    const link = target.closest('a');
+    const modifiedLinkClick = link && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target === '_blank' || link.hasAttribute('download'));
+    if (modifiedLinkClick) return;
+
+    window.clearTimeout(navigationTimer);
+    startWave(event.clientX, event.clientY);
+    markRippleSource(target);
+    applyContextTransform(target);
+
+    if (link) {
+      event.preventDefault();
+      navigationTimer = window.setTimeout(() => followLink(link), reducedMotion.matches ? 180 : WAVE_MS);
+    }
+  });
+})();
+</script>
 </body>
 </html>
