@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULS · GlossaryTermAccordion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-canvas:#0B0E14;
+  --color-surface-1:rgba(255,255,255,0.04);
+  --color-surface-2:rgba(255,255,255,0.06);
+  --color-border-soft:rgba(255,255,255,0.08);
+  --color-border-strong:rgba(255,255,255,0.12);
+  --color-text-primary:#F4F6FA;
+  --color-text-secondary:#B8C0D0;
+  --color-text-muted:#8B93A7;
+  --color-accent:#8D2AF3;
+  --font-primary:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono','Fira Code',monospace;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:20px;
+  --space-6:24px;
+  --space-8:32px;
+  --space-10:40px;
+  --radius-sm:6px;
+  --radius-md:10px;
+  --ease-standard:cubic-bezier(0.4,0,0.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  min-height:100vh;
+  background:var(--color-canvas);
+  color:var(--color-text-secondary);
+  font-family:var(--font-primary);
+  padding:var(--space-10) var(--space-6);
+}
+.wrap{max-width:760px;margin:0 auto}
+.showcase-title{
+  color:var(--color-text-primary);
+  font-size:clamp(1.2rem,2.2vw,1.65rem);
+  font-weight:750;
+  margin-bottom:6px;
+}
+.showcase-sub{
+  max-width:64ch;
+  color:var(--color-text-muted);
+  font-size:0.84rem;
+  line-height:1.6;
+  margin-bottom:var(--space-8);
+}
+.group-label{
+  display:flex;
+  align-items:center;
+  gap:var(--space-2);
+  margin-bottom:var(--space-4);
+  color:var(--color-text-muted);
+  font-family:var(--font-mono);
+  font-size:0.66rem;
+  letter-spacing:0.18em;
+  text-transform:uppercase;
+}
+.group-label .dot{width:6px;height:6px;border-radius:50%;background:var(--color-accent)}
+.glossary-list{
+  background:var(--color-surface-1);
+  border:1px solid var(--color-border-soft);
+  border-radius:var(--radius-md);
+  overflow:hidden;
+}
+.glossary-term + .glossary-term{
+  border-top:1px solid var(--color-border-soft);
+}
+.glossary-term__trigger{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--space-3);
+  padding:var(--space-4);
+  border:0;
+  background:transparent;
+  color:inherit;
+  text-align:left;
+  cursor:pointer;
+  transition:background 0.2s var(--ease-standard);
+}
+.glossary-term__trigger:hover,
+.glossary-term.is-open .glossary-term__trigger{
+  background:var(--color-surface-2);
+}
+.glossary-term__title{
+  color:var(--color-text-primary);
+  font-size:0.84rem;
+  font-weight:650;
+  line-height:1.35;
+}
+.glossary-term__chevron{
+  color:var(--color-text-muted);
+  transition:transform 0.2s var(--ease-standard);
+}
+.glossary-term.is-open .glossary-term__chevron{transform:rotate(180deg)}
+.glossary-term__content{
+  display:none;
+  padding:0 var(--space-4) var(--space-4);
+}
+.glossary-term.is-open .glossary-term__content{display:block}
+.glossary-term__content p{
+  color:var(--color-text-secondary);
+  font-size:0.8rem;
+  line-height:1.6;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="showcase-title">GlossaryTermAccordion</h1>
+  <p class="showcase-sub">
+    Lehký knowledge pattern pro levý sidebar nebo drawer list. Není to karta uvnitř karty. Je to list item,
+    který se jen rozbalí do krátké definice.
+  </p>
+
+  <div class="group-label"><span class="dot"></span>Collapsed And Expanded</div>
+
+  <section class="glossary-list" id="glossaryList">
+    <article class="glossary-term">
+      <button class="glossary-term__trigger" type="button" aria-expanded="false">
+        <span class="glossary-term__title">Context window</span>
+        <span class="glossary-term__chevron">⌄</span>
+      </button>
+      <div class="glossary-term__content">
+        <p>Maximální objem kontextu, který model zvládne držet v jedné interakci bez ztráty návaznosti.</p>
+      </div>
+    </article>
+
+    <article class="glossary-term is-open">
+      <button class="glossary-term__trigger" type="button" aria-expanded="true">
+        <span class="glossary-term__title">System prompt</span>
+        <span class="glossary-term__chevron">⌄</span>
+      </button>
+      <div class="glossary-term__content">
+        <p>Nejvyšší instrukční vrstva, která určuje roli, pravidla a mantinely modelu pro danou interakci nebo workflow.</p>
+      </div>
+    </article>
+
+    <article class="glossary-term">
+      <button class="glossary-term__trigger" type="button" aria-expanded="false">
+        <span class="glossary-term__title">Few-shot prompting</span>
+        <span class="glossary-term__chevron">⌄</span>
+      </button>
+      <div class="glossary-term__content">
+        <p>Technika, kdy modelu ukážeš několik příkladů vstupu a očekávaného výstupu, aby se lépe chytil požadovaného vzoru.</p>
+      </div>
+    </article>
+  </section>
+</div>
+<script>
+document.querySelectorAll('.glossary-term__trigger').forEach((button)=>{
+  button.addEventListener('click',()=>{
+    const item=button.closest('.glossary-term');
+    const isOpen=item.classList.toggle('is-open');
+    button.setAttribute('aria-expanded',String(isOpen));
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULS · Brand Accents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0E14;--s1:rgba(255,255,255,.04);--s2:rgba(255,255,255,.06);--s3:rgba(255,255,255,.08);
+  --bd:rgba(255,255,255,.08);--bds:rgba(255,255,255,.12);--tp:#F4F6FA;--ts:#B8C0D0;--tm:#A4ACBE;
+  --a:#8D2AF3;--a-soft:rgba(141,42,243,.12);--a-glow:rgba(141,42,243,.22);
+  --p:'Montserrat',sans-serif;--m:'IBM Plex Mono',monospace;--r:10px;--rl:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ts);font-family:var(--p);padding:40px 24px}
+.wrap{max-width:980px;margin:0 auto}
+.eyebrow{color:var(--tm);font:600 .68rem var(--m);letter-spacing:.18em;text-transform:uppercase}
+.title{color:var(--tp);font-size:1.72rem;line-height:1.12;margin:10px 0}
+.copy{max-width:72ch;color:var(--tm);font-size:.88rem;line-height:1.6;margin-bottom:24px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:18px}
+.card:hover{background:var(--s2);border-color:var(--bds)}
+.hero{
+  background:linear-gradient(135deg,rgba(141,42,243,.14),transparent 58%),var(--s2);
+  border:1px solid rgba(141,42,243,.24);
+  box-shadow:0 20px 60px rgba(141,42,243,.1),0 0 0 1px rgba(141,42,243,.08)
+}
+.nav-pill{display:inline-flex;gap:8px;padding:4px;background:rgba(255,255,255,.03);border:1px solid var(--bd);border-radius:999px}
+.nav-pill span{padding:10px 14px;border-radius:999px;color:var(--tm);font:600 .74rem var(--m)}
+.nav-pill .active{color:var(--tp);background:var(--a-soft);border:1px solid rgba(141,42,243,.24);box-shadow:0 0 18px rgba(141,42,243,.18)}
+.mini{color:var(--tm);font:600 .68rem var(--m);letter-spacing:.16em;text-transform:uppercase}
+.h{color:var(--tp);font-size:.96rem;font-weight:700;line-height:1.35;margin:8px 0}
+.p{color:var(--ts);font-size:.82rem;line-height:1.55}
+.rule{margin-top:12px;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);font:400 .74rem var(--m);line-height:1.55;color:var(--ts)}
+.list{display:grid;gap:10px;margin-top:10px}
+.li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.li:last-child{border-bottom:0}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Brand layer</div>
+  <h1 class="title">Brand Accents</h1>
+  <p class="copy">Tohle je samostatná vrstva pro purple glow, accent outline a selected/hero treatment. Je to doplněk ke quiet core systému, ne jeho náhrada. Sebastianův závěr: fialová má fungovat jako emphasis, ne jako slabě čitelný text na tmě.</p>
+
+  <div class="grid">
+    <div class="card hero">
+      <div class="mini">Hero surface</div>
+      <div class="h">DayHeader / featured shell</div>
+      <p class="p">Silnější brand surface s glow a accent borderem.</p>
+      <div class="rule">background: linear-gradient(135deg, rgba(141,42,243,0.12), transparent 58%), var(--glass-2)<br>border: 1px solid rgba(141,42,243,0.24)<br>use: hero, featured shell, major CTA context</div>
+    </div>
+
+    <div class="card">
+      <div class="mini">Active nav</div>
+      <div class="h">Selected tab pattern</div>
+      <div class="nav-pill"><span class="active">Planner</span><span>Studium</span><span>Meets</span></div>
+      <div class="rule">selected text = `text-primary`<br>accent = background / border / glow support<br>nikdy ne spoléhat na slabou fialovou typografii jako hlavní kontrast</div>
+    </div>
+
+    <div class="card">
+      <div class="mini">Selected tile</div>
+      <div class="h">Day tile highlight</div>
+      <p class="p">Accent outline a lehký glow značí aktuální focus point v overview gridu.</p>
+      <div class="rule">selected = accent border + tint<br>hover = glass-2 + stronger border<br>default = quiet surface</div>
+    </div>
+
+    <div class="card">
+      <div class="mini">Usage rules</div>
+      <div class="list">
+        <div class="li"><span>DayHeader</span><span>ano</span></div>
+        <div class="li"><span>Top nav active</span><span>ano</span></div>
+        <div class="li"><span>Selected day tile</span><span>ano</span></div>
+        <div class="li"><span>TaskCard default</span><span>ne</span></div>
+        <div class="li"><span>QuestRow default</span><span>ne</span></div>
+        <div class="li"><span>Glossary rows</span><span>ne</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

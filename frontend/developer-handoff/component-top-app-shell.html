@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULS · TopAppShell</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B0E14;--glass-1:rgba(255,255,255,.04);--glass-2:rgba(255,255,255,.06);--glass-3:rgba(255,255,255,.08);
+  --glass-border:rgba(255,255,255,.08);--glass-border-strong:rgba(255,255,255,.12);
+  --tp:#F4F6FA;--ts:#B8C0D0;--tm:#A4ACBE;--a:#8D2AF3;--ag:rgba(141,42,243,.22);
+  --p:'Montserrat',sans-serif;--m:'IBM Plex Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ts);font-family:var(--p);padding:40px 24px}
+.wrap{max-width:1180px;margin:0 auto}
+.shell{
+  display:flex;justify-content:space-between;gap:16px;align-items:center;
+  padding:18px 22px;border-radius:18px;background:var(--glass-1);border:1px solid var(--glass-border);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.30);
+}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{
+  width:44px;height:44px;border-radius:12px;background:var(--a);display:grid;place-items:center;
+  color:#fff;font-weight:800;box-shadow:0 4px 16px var(--ag)
+}
+.eyebrow{color:var(--tm);font-size:.72rem}
+.title{color:var(--tp);font-size:1rem;font-weight:700}
+.nav{
+  display:flex;align-items:center;gap:4px;padding:4px 6px;border-radius:999px;
+  background:var(--glass-1);border:1px solid var(--glass-border);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.nav span{
+  min-height:32px;display:inline-flex;align-items:center;gap:7px;
+  padding:6px 12px;border-radius:999px;color:var(--ts);font:500 .84rem var(--p);
+  transition:background .2s,border-color .2s,color .2s,transform .2s;
+  border:1px solid transparent;
+}
+.nav span:hover{
+  background:var(--glass-3);color:var(--tp)
+}
+.nav .active{
+  color:var(--tp);background:var(--glass-3);border-color:rgba(141,42,243,.28);
+  box-shadow:inset 0 -2px 0 var(--a)
+}
+@media(max-width:900px){
+  .shell{flex-direction:column;align-items:flex-start}
+  .nav{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="shell">
+    <div class="brand">
+      <div class="logo">P</div>
+      <div>
+        <div class="eyebrow">PULS</div>
+        <div class="title">Claude planner</div>
+      </div>
+    </div>
+    <div class="nav">
+      <span class="active">Planner</span>
+      <span>Studium</span>
+      <span>Meets</span>
+      <span>Profil</span>
+      <span>Odhlásit</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
