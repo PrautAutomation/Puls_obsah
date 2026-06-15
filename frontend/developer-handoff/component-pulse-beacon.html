@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULS · Component Library</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --color-canvas:#0B0E14;--glass-1:rgba(255,255,255,0.04);--glass-2:rgba(255,255,255,0.06);--glass-3:rgba(255,255,255,0.08);
+  --glass-border:rgba(255,255,255,0.08);--glass-border-strong:rgba(255,255,255,0.12);
+  --text-primary:#F4F6FA;--text-secondary:#B8C0D0;--text-muted:#A4ACBE;--accent:#8D2AF3;--accent-soft:rgba(141,42,243,0.12);--accent-glow:rgba(141,42,243,0.22);
+  --success:#10B981;--success-bg:rgba(16,185,129,0.08);--success-border:rgba(52,211,153,0.34);
+  --pulse-c1:#8D2AF3;--pulse-c2:#22D3EE;--pulse-c3:#10B981;
+  --pulse-c1-rgb:141,42,243;--pulse-c2-rgb:34,211,238;--pulse-c3-rgb:16,185,129;
+  --pulse-rate:3s;--pulse-intensity:1;--pulse-reach:5.2;
+  --font-primary:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'IBM Plex Mono','Fira Code',monospace;
+  --radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(120% 82% at 50% -12%,rgba(var(--pulse-c1-rgb),.18),transparent 48%),
+    radial-gradient(82% 64% at 8% 6%,rgba(var(--pulse-c2-rgb),.09),transparent 40%),
+    radial-gradient(78% 62% at 92% 2%,rgba(var(--pulse-c3-rgb),.055),transparent 42%),
+    var(--color-canvas);
+  color:var(--text-secondary);font-family:var(--font-primary);line-height:1.6;padding:40px 24px 90px;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;text-rendering:geometricPrecision;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;opacity:0;
+  background:
+    radial-gradient(circle at var(--wave-x,50%) var(--wave-y,50%),rgba(255,255,255,.26) 0 2px,rgba(var(--pulse-c2-rgb),.34) 3px 8%,rgba(var(--pulse-c1-rgb),.28) 18%,rgba(var(--pulse-c3-rgb),.10) 34%,transparent 62%),
+    conic-gradient(from var(--wave-angle,0deg) at var(--wave-x,50%) var(--wave-y,50%),transparent 0deg,rgba(255,255,255,.14) 16deg,rgba(var(--pulse-c2-rgb),.18) 34deg,rgba(var(--pulse-c1-rgb),.14) 58deg,transparent 96deg),
+    radial-gradient(circle at var(--wave-x,50%) var(--wave-y,50%),transparent 0 22%,rgba(255,255,255,.07) 23%,transparent 26%);
+  mix-blend-mode:screen;
+}
+.wrap{position:relative;max-width:1240px;margin:0 auto;transition:filter .34s ease}
+body.is-wave-active::before{animation:screenPulse .86s cubic-bezier(.16,1,.3,1) forwards}
+body.is-wave-active .wrap{filter:saturate(1.18) contrast(1.06) brightness(1.03)}
+.click-wave-layer{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;contain:strict}
+.click-wave{
+  position:absolute;left:var(--wave-x);top:var(--wave-y);width:168px;height:168px;border-radius:50%;
+  transform:translate(-50%,-50%);transform-origin:center;pointer-events:none;isolation:isolate;contain:layout paint;
+  mix-blend-mode:screen;filter:saturate(1.35);will-change:transform,opacity;
+}
+.click-wave__halo,.click-wave__ring,.click-wave__sweep,.click-wave__flash{
+  position:absolute;inset:0;border-radius:50%;pointer-events:none;transform-origin:center;will-change:transform,opacity,filter;
+}
+.click-wave__halo{
+  background:radial-gradient(circle,rgba(255,255,255,.72) 0 4%,rgba(255,255,255,.34) 5% 12%,rgba(var(--pulse-c2-rgb),.42) 24%,rgba(var(--pulse-c1-rgb),.24) 48%,rgba(var(--pulse-c3-rgb),.11) 64%,transparent 78%);
+  opacity:0;animation:clickHalo .86s cubic-bezier(.16,1,.3,1) forwards;
+}
+.click-wave__ring{inset:10px;border:1.5px solid rgba(255,255,255,.66);box-shadow:0 0 20px rgba(var(--pulse-c2-rgb),.34),inset 0 0 18px rgba(255,255,255,.08);opacity:0;transform:scale(.06);animation:clickRing .86s cubic-bezier(.16,1,.3,1) forwards}
+.click-wave__ring--b{inset:24px;border-color:rgba(var(--pulse-c1-rgb),.62);box-shadow:0 0 24px rgba(var(--pulse-c1-rgb),.32),inset 0 0 18px rgba(var(--pulse-c1-rgb),.08);animation-delay:.055s}
+.click-wave__ring--c{inset:40px;border-color:rgba(var(--pulse-c3-rgb),.48);box-shadow:0 0 24px rgba(var(--pulse-c3-rgb),.22),inset 0 0 18px rgba(var(--pulse-c3-rgb),.08);animation-delay:.11s}
+.click-wave__sweep{
+  background:conic-gradient(from -18deg,transparent 0deg,rgba(255,255,255,.48) 16deg,rgba(var(--pulse-c2-rgb),.30) 34deg,rgba(var(--pulse-c1-rgb),.24) 56deg,transparent 92deg);
+  -webkit-mask:radial-gradient(circle,transparent 0 26%,#000 29% 76%,transparent 79%);
+          mask:radial-gradient(circle,transparent 0 26%,#000 29% 76%,transparent 79%);
+  opacity:0;transform:rotate(var(--wave-angle,0deg)) scale(.12);animation:clickSweep .82s cubic-bezier(.16,1,.3,1) forwards;
+}
+.click-wave__flash{
+  inset:60px;background:radial-gradient(circle,rgba(255,255,255,.96) 0 18%,rgba(255,255,255,.72) 19% 34%,rgba(var(--pulse-c2-rgb),.58) 48%,transparent 74%);
+  box-shadow:0 0 22px rgba(255,255,255,.42),0 0 54px rgba(var(--pulse-c2-rgb),.42),0 0 94px rgba(var(--pulse-c1-rgb),.26);
+  opacity:0;transform:scale(.1);animation:clickFlash .44s cubic-bezier(.16,1,.3,1) forwards;
+}
+.click-wave__spark{
+  position:absolute;left:50%;top:50%;width:var(--spark-size,4px);height:var(--spark-size,4px);border-radius:50%;pointer-events:none;
+  background:rgba(255,255,255,.92);box-shadow:0 0 12px rgba(var(--pulse-c2-rgb),.72),0 0 22px rgba(var(--pulse-c1-rgb),.36);
+  opacity:0;transform:translate(-50%,-50%) scale(.2);animation:clickSparkTravel .62s cubic-bezier(.16,1,.3,1) forwards;animation-delay:var(--spark-delay,0s);
+}
+@keyframes clickHalo{0%{opacity:.95;transform:scale(.07);filter:blur(0)}36%{opacity:.42}100%{opacity:0;transform:scale(var(--wave-halo-scale));filter:blur(1.4px)}}
+@keyframes clickRing{0%{opacity:.95;transform:scale(.04)}22%{opacity:.84}72%{opacity:.30}100%{opacity:0;transform:scale(var(--wave-scale))}}
+@keyframes clickSweep{0%{opacity:.86;transform:rotate(var(--wave-angle,0deg)) scale(.10)}52%{opacity:.36}100%{opacity:0;transform:rotate(calc(var(--wave-angle,0deg) + 156deg)) scale(var(--wave-sweep-scale))}}
+@keyframes clickFlash{0%{opacity:1;transform:scale(.12);filter:brightness(1.45)}42%{opacity:.90;transform:scale(.80);filter:brightness(1.12)}100%{opacity:0;transform:scale(1.42);filter:brightness(1)}}
+@keyframes clickSparkTravel{0%{opacity:0;transform:translate(-50%,-50%) scale(.2)}14%{opacity:.95}100%{opacity:0;transform:translate(-50%,-50%) translate(var(--spark-x),var(--spark-y)) scale(.05)}}
+@keyframes screenPulse{0%{opacity:0}10%{opacity:.92}46%{opacity:.40}100%{opacity:0}}
+.is-ripple-source{
+  outline:1px solid rgba(255,255,255,.38);outline-offset:3px;
+  box-shadow:0 0 0 1px rgba(var(--pulse-c1-rgb),.30),0 0 36px rgba(var(--pulse-c1-rgb),.42),0 0 78px rgba(var(--pulse-c2-rgb),.14);
+  animation:sourceKick .74s cubic-bezier(.16,1,.3,1);transform-origin:center;
+}
+@keyframes sourceKick{0%{transform:scale(1);filter:brightness(1)}34%{transform:scale(1.028);filter:brightness(1.12)}100%{transform:scale(1);filter:brightness(1)}}
+.hero{margin-bottom:34px}
+.eyebrow,.section-label{display:inline-flex;align-items:center;gap:8px;color:var(--text-muted);font-family:var(--font-mono);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase}
+.eyebrow::before,.section-label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+h1{color:var(--text-primary);font-size:clamp(1.45rem,2.8vw,2.25rem);line-height:1.08;margin:12px 0}
+.hero p,.section-copy{max-width:80ch;color:var(--text-muted);font-size:.9rem}
+.toc,.link-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+.toc a,.link-row a{color:var(--text-secondary);text-decoration:none;font-family:var(--font-mono);font-size:.72rem;padding:8px 10px;border-radius:var(--radius-sm);background:var(--glass-1);border:1px solid var(--glass-border);transition:background .2s,border-color .2s,color .2s}
+.toc a:hover,.link-row a:hover{background:var(--glass-2);border-color:var(--glass-border-strong);color:var(--text-primary)}
+body.is-wave-active .toc a,body.is-wave-active .link-row a{border-color:rgba(141,42,243,.24)}
+.section{margin-top:42px}
+.section-head{margin-bottom:18px}
+.section-title{color:var(--text-primary);font-size:1.06rem;font-weight:700;margin-top:8px}
+.grid{display:grid;gap:16px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.metric-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.metric-row.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.card,.panel{
+  position:relative;overflow:hidden;
+  background:var(--glass-1);
+  border:1px solid var(--glass-border);
+  transition:background .2s,border-color .2s,transform .2s,box-shadow .2s,filter .2s;
+}
+.card::before,.panel::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;mix-blend-mode:screen;
+  background:radial-gradient(circle at var(--local-x,50%) var(--local-y,0%),rgba(255,255,255,.16),rgba(var(--pulse-c2-rgb),.12) 16%,rgba(var(--pulse-c1-rgb),.10) 34%,transparent 58%);
+  transition:opacity .24s ease;
+}
+.card:hover,.panel:hover{background:var(--glass-2);border-color:var(--glass-border-strong);transform:translateY(-1px)}
+.card:hover::before,.panel:hover::before{opacity:.28}
+.card.is-selected,.panel.is-selected{
+  background:linear-gradient(135deg,rgba(var(--pulse-c1-rgb),.23),rgba(var(--pulse-c3-rgb),.07) 42%,transparent 68%),var(--glass-3);
+  border-color:rgba(187,134,252,.56);
+  box-shadow:0 0 0 1px rgba(var(--pulse-c1-rgb),.24),0 20px 70px rgba(var(--pulse-c1-rgb),.24),0 0 90px rgba(var(--pulse-c2-rgb),.10);
+  transform:translateY(-3px) scale(1.012);
+}
+.card.is-selected::before,.panel.is-selected::before{opacity:.62;animation:surfaceLocalPulse 1.12s ease-out forwards}
+.card.is-selected::after,.panel.is-selected::after{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;mix-blend-mode:screen;opacity:0;
+  background:linear-gradient(115deg,transparent 0 28%,rgba(255,255,255,.24) 45%,rgba(var(--pulse-c2-rgb),.16) 50%,transparent 66%);
+  transform:translateX(-42%);animation:surfaceSheen 1.08s cubic-bezier(.16,1,.3,1) forwards;
+}
+@keyframes surfaceLocalPulse{0%{opacity:.78;transform:scale(.96)}100%{opacity:0;transform:scale(1.08)}}
+@keyframes surfaceSheen{0%{opacity:0;transform:translateX(-46%)}18%{opacity:.70}100%{opacity:0;transform:translateX(46%)}}
+body.is-wave-active .card,body.is-wave-active .panel{border-color:rgba(187,134,252,.34);box-shadow:0 0 0 1px rgba(var(--pulse-c1-rgb),.13),0 0 36px rgba(var(--pulse-c1-rgb),.10)}
+.card{border-radius:var(--radius-md);padding:16px}
+.panel{border-radius:var(--radius-lg);padding:20px}
+.mini{color:var(--text-muted);font-family:var(--font-mono);font-size:.68rem;letter-spacing:.16em;text-transform:uppercase}
+.title{color:var(--text-primary);font-size:.94rem;font-weight:700;line-height:1.35;margin:8px 0}
+.body{color:var(--text-secondary);font-size:.81rem;line-height:1.55}
+.rule-box{margin-top:12px;padding:12px 14px;border-radius:10px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);font-family:var(--font-mono);font-size:.74rem;color:var(--text-secondary);line-height:1.55}
+.accent-card{
+  background:linear-gradient(135deg,rgba(141,42,243,0.12),transparent 58%),var(--glass-2);
+  border:1px solid rgba(141,42,243,0.24);
+  box-shadow:0 0 0 1px rgba(141,42,243,0.08),0 20px 60px rgba(141,42,243,0.08);
+}
+.accent-card:hover{
+  background:linear-gradient(135deg,rgba(141,42,243,0.14),transparent 56%),var(--glass-3);
+  box-shadow:0 0 0 1px rgba(141,42,243,0.1),0 24px 70px rgba(141,42,243,0.12);
+}
+.list{display:grid;gap:10px}
+.li{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--glass-border)}
+.li:last-child{border-bottom:0}
+.token{display:inline-flex;align-items:center;padding:3px 8px;border-radius:var(--radius-sm);border:1px solid rgba(52,211,153,0.18);background:rgba(16,185,129,0.04);color:rgba(16,185,129,0.78);font-family:var(--font-mono);font-size:.72rem;font-weight:700}
+.nav-preview{
+  display:flex;justify-content:space-between;gap:16px;align-items:center;
+  padding:18px 20px;border-radius:18px;background:var(--glass-1);border:1px solid var(--glass-border);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 8px 32px rgba(0,0,0,.30)
+}
+.pill-nav{
+  display:flex;align-items:center;gap:4px;padding:4px 6px;background:var(--glass-1);border:1px solid var(--glass-border);
+  border-radius:999px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)
+}
+.pill-nav span{
+  min-height:32px;padding:6px 12px;border-radius:999px;color:var(--text-secondary);font:500 .84rem var(--font-primary);
+  border:1px solid transparent;transition:background .2s,border-color .2s,color .2s,box-shadow .2s
+}
+.pill-nav span:hover{background:var(--glass-3);color:var(--text-primary)}
+.pill-nav .active{color:var(--text-primary);background:var(--glass-3);border:1px solid rgba(141,42,243,0.28);box-shadow:inset 0 -2px 0 var(--accent)}
+.pill-nav span.is-selected{color:var(--text-primary);background:rgba(141,42,243,.24);border-color:rgba(187,134,252,.58);box-shadow:inset 0 -2px 0 var(--accent),0 0 30px rgba(141,42,243,.34)}
+.donut{width:120px;height:120px;border-radius:50%;border:10px solid rgba(255,255,255,0.09);display:grid;place-items:center;position:relative}
+.donut::after{content:"";position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:10px;height:10px;border-radius:50%;background:var(--success)}
+.donut strong{color:var(--text-primary);font-size:2rem;line-height:1}
+.checklist-row{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:14px;align-items:start;padding:14px 12px;border:1px solid transparent;border-radius:10px;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.checklist-row:hover{background:var(--glass-2);border-color:var(--glass-border-strong);transform:translateY(-1px)}
+.checklist-row + .checklist-row{margin-top:6px}
+.checklist-row.is-done{background:var(--success-bg);border-color:rgba(52,211,153,.34);box-shadow:0 0 0 1px rgba(52,211,153,.08),0 0 28px rgba(16,185,129,.12)}
+.box{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.22);margin-top:4px;transition:background .2s,border-color .2s}
+.checklist-row.is-done .box{background:var(--success);border-color:var(--success);position:relative}
+.checklist-row.is-done .box::after{content:"✓";position:absolute;inset:-2px;display:grid;place-items:center;color:#052e1d;font-size:10px;font-weight:800}
+.checklist-row.is-done .token{color:var(--success);background:var(--success-bg);border-color:var(--success-border)}
+.check-title{color:var(--text-primary);font-size:.95rem;font-weight:650;line-height:1.3}
+.check-sub{color:var(--text-secondary);font-size:.82rem;line-height:1.35;margin-top:2px}
+.quest-row{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border:1px solid transparent;border-radius:10px;cursor:pointer;transition:background .2s,border-color .2s,transform .2s}
+.quest-row:hover{background:var(--glass-2);border-color:var(--glass-border-strong);transform:translateY(-1px)}
+.quest-row__box{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--glass-border-strong)}
+.quest-row.is-done{background:var(--success-bg);border-color:rgba(52,211,153,0.34);box-shadow:0 0 0 1px rgba(52,211,153,.08),0 0 28px rgba(16,185,129,.12)}
+.quest-row.is-done .quest-row__box{background:var(--success);border-color:var(--success);position:relative}
+.quest-row.is-done .quest-row__box::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#052e1d;font-size:12px;font-weight:800}
+.quest-row.is-done .token{color:var(--success);background:var(--success-bg);border-color:var(--success-border)}
+.quest-row__title{color:var(--text-primary);font-size:.84rem;font-weight:600;line-height:1.35}
+.day-tile{min-height:190px}
+/* ====== Motion layer: Signal Beacon / Pulse System ====== */
+.pulse-section{--pulse-rate:3s;--pulse-intensity:1;--pulse-reach:5.2}
+.pulse-showcase{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(320px,.92fr);gap:16px;align-items:stretch}
+.pulse-hero{
+  position:relative;min-height:430px;overflow:hidden;display:grid;place-items:center;isolation:isolate;padding:28px;border-radius:var(--radius-lg);
+  border:1px solid rgba(var(--pulse-c1-rgb),.28);
+  background:
+    radial-gradient(circle at 50% 48%,rgba(var(--pulse-c2-rgb),.18),transparent 28%),
+    radial-gradient(circle at 20% 18%,rgba(var(--pulse-c1-rgb),.19),transparent 32%),
+    radial-gradient(circle at 82% 76%,rgba(var(--pulse-c3-rgb),.11),transparent 34%),
+    linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.024));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),inset 0 -1px 0 rgba(255,255,255,.035),0 26px 80px rgba(0,0,0,.34),0 0 86px rgba(var(--pulse-c1-rgb),.12);
+}
+.pulse-hero::before{
+  content:"";position:absolute;inset:0;z-index:-3;opacity:.34;
+  background-image:linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:30px 30px;-webkit-mask-image:radial-gradient(circle at 50% 50%,#000 0 50%,transparent 78%);mask-image:radial-gradient(circle at 50% 50%,#000 0 50%,transparent 78%);
+}
+.pulse-hero::after{content:"";position:absolute;inset:auto 9% 7%;height:35%;z-index:-2;opacity:calc(.50*var(--pulse-intensity));background:radial-gradient(ellipse at center,rgba(var(--pulse-c1-rgb),.38),rgba(var(--pulse-c2-rgb),.16) 46%,transparent 74%);filter:blur(28px);animation:pulseGround calc(var(--pulse-rate)*1.24) ease-in-out infinite}
+.pulse-frequency{position:absolute;top:16px;left:18px;z-index:5;display:inline-flex;gap:9px;align-items:center;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.045);color:var(--text-muted);font:.68rem var(--font-mono);letter-spacing:.12em;text-transform:uppercase;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.pulse-frequency::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--pulse-c3);box-shadow:0 0 14px var(--pulse-c3);animation:pulseLed calc(var(--pulse-rate)*.72) ease-in-out infinite}
+.pulse-map{position:absolute;inset:18px;border-radius:calc(var(--radius-lg) - 2px);pointer-events:none;overflow:hidden;z-index:-1;border:1px solid rgba(255,255,255,.045)}
+.pulse-map::before{content:"";position:absolute;inset:-12%;background:repeating-radial-gradient(circle at 50% 52%,transparent 0 38px,rgba(255,255,255,.08) 39px 40px),linear-gradient(rgba(255,255,255,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:auto,42px 42px,42px 42px;opacity:.48;animation:pulseMapDrift calc(var(--pulse-rate)*4.2) linear infinite}
+.pulse-map::after{content:"";position:absolute;left:-20%;right:-20%;top:52%;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--pulse-c2-rgb),.64),rgba(255,255,255,.34),transparent);box-shadow:0 0 18px rgba(var(--pulse-c2-rgb),.38);animation:pulseScanline calc(var(--pulse-rate)*1.15) ease-in-out infinite}
+.pulse-beacon{position:relative;width:296px;height:296px;display:grid;place-items:center;transform:translateZ(0);z-index:2}
+.pulse-beacon::before,.pulse-beacon::after{content:"";position:absolute;border-radius:50%;pointer-events:none;mix-blend-mode:screen}
+.pulse-beacon::before{inset:18px;background:radial-gradient(circle,rgba(255,255,255,.18),rgba(var(--pulse-c2-rgb),.26) 32%,rgba(var(--pulse-c1-rgb),.17) 58%,transparent 74%);filter:blur(20px);opacity:calc(.42*var(--pulse-intensity));animation:pulseAura var(--pulse-rate) ease-in-out infinite}
+.pulse-beacon::after{inset:72px;background:radial-gradient(circle,rgba(255,255,255,.24),rgba(var(--pulse-c2-rgb),.22) 44%,transparent 74%);filter:blur(18px);opacity:.62;animation:pulseInnerAura calc(var(--pulse-rate)*.8) ease-in-out infinite}
+.pulse-axis{position:absolute;inset:0;border-radius:50%;opacity:.48;z-index:0}
+.pulse-axis::before,.pulse-axis::after{content:"";position:absolute;left:50%;top:50%;width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);transform:translate(-50%,-50%)}
+.pulse-axis::after{transform:translate(-50%,-50%) rotate(90deg)}
+.pulse-sweep{position:absolute;inset:0;border-radius:50%;z-index:1;mix-blend-mode:screen;opacity:calc(.88*var(--pulse-intensity));background:conic-gradient(from -32deg,transparent 0 274deg,rgba(255,255,255,.48) 288deg,var(--pulse-c2) 308deg,rgba(var(--pulse-c1-rgb),.24) 332deg,transparent 356deg);-webkit-mask:radial-gradient(circle,transparent 0 46px,#000 48px,#000 138px,transparent 142px);mask:radial-gradient(circle,transparent 0 46px,#000 48px,#000 138px,transparent 142px);animation:pulseSpin calc(var(--pulse-rate)*1.42) linear infinite}
+.pulse-orbit{position:absolute;border-radius:50%;z-index:1;border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 0 24px rgba(var(--pulse-c1-rgb),.08),0 0 28px rgba(var(--pulse-c2-rgb),.07)}
+.pulse-orbit--outer{inset:8px;border-style:dashed;animation:pulseOrbit calc(var(--pulse-rate)*3) linear infinite}
+.pulse-orbit--mid{inset:38px;animation:pulseOrbit calc(var(--pulse-rate)*2.1) linear infinite reverse}
+.pulse-orbit--inner{inset:72px;border-color:rgba(var(--pulse-c2-rgb),.22);box-shadow:inset 0 0 18px rgba(var(--pulse-c2-rgb),.08)}
+.pulse-rings{position:absolute;inset:0;z-index:2;pointer-events:none}
+.pulse-rings span{position:absolute;top:50%;left:50%;width:86px;height:86px;margin:-43px 0 0 -43px;border-radius:50%;opacity:0;mix-blend-mode:screen;will-change:transform,opacity;animation:pulseRing var(--pulse-rate) cubic-bezier(.18,.76,.22,1) infinite}
+.pulse-rings span:nth-child(1){border:1px solid var(--pulse-c2);box-shadow:0 0 18px var(--pulse-c2),inset 0 0 16px rgba(var(--pulse-c2-rgb),.10)}
+.pulse-rings span:nth-child(2){border:1px solid var(--pulse-c1);box-shadow:0 0 18px var(--pulse-c1),inset 0 0 16px rgba(var(--pulse-c1-rgb),.10);animation-delay:calc(var(--pulse-rate)*-.17)}
+.pulse-rings span:nth-child(3){border:1px solid var(--pulse-c3);box-shadow:0 0 17px var(--pulse-c3),inset 0 0 16px rgba(var(--pulse-c3-rgb),.09);animation-delay:calc(var(--pulse-rate)*-.34)}
+.pulse-rings span:nth-child(4){border:1px solid var(--pulse-c2);box-shadow:0 0 18px var(--pulse-c2),inset 0 0 16px rgba(var(--pulse-c2-rgb),.10);animation-delay:calc(var(--pulse-rate)*-.51)}
+.pulse-rings span:nth-child(5){border:1px solid var(--pulse-c1);box-shadow:0 0 18px var(--pulse-c1),inset 0 0 16px rgba(var(--pulse-c1-rgb),.10);animation-delay:calc(var(--pulse-rate)*-.68)}
+.pulse-rings span:nth-child(6){border:1px solid rgba(255,255,255,.58);box-shadow:0 0 18px rgba(255,255,255,.18),inset 0 0 16px rgba(255,255,255,.08);animation-delay:calc(var(--pulse-rate)*-.85)}
+.pulse-nodes{position:absolute;inset:0;z-index:3;animation:pulseOrbit calc(var(--pulse-rate)*2.8) linear infinite}
+.pulse-nodes i{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--pulse-c2);box-shadow:0 0 16px var(--pulse-c2),0 0 30px rgba(var(--pulse-c2-rgb),.24);transform:translate(-50%,-50%)}
+.pulse-nodes i:nth-child(1){left:50%;top:5%;background:var(--pulse-c2)}.pulse-nodes i:nth-child(2){left:95%;top:50%;background:var(--pulse-c1);box-shadow:0 0 16px var(--pulse-c1),0 0 30px rgba(var(--pulse-c1-rgb),.24)}.pulse-nodes i:nth-child(3){left:50%;top:95%;background:var(--pulse-c3);box-shadow:0 0 16px var(--pulse-c3),0 0 30px rgba(var(--pulse-c3-rgb),.24)}.pulse-nodes i:nth-child(4){left:5%;top:50%;background:#fff;box-shadow:0 0 16px rgba(255,255,255,.52),0 0 30px rgba(var(--pulse-c2-rgb),.22)}
+.pulse-core{position:relative;z-index:4;width:82px;height:82px;border-radius:50%;overflow:hidden;background:radial-gradient(circle at 34% 26%,#fff 0 10%,rgba(255,255,255,.72) 11% 18%,transparent 19%),radial-gradient(circle at 42% 38%,#f3fdff 0 18%,var(--pulse-c2) 38%,var(--pulse-c1) 78%,#34105f 100%);border:1px solid rgba(255,255,255,.58);box-shadow:0 0 calc(30px*var(--pulse-intensity)) rgba(var(--pulse-c2-rgb),.90),0 0 calc(86px*var(--pulse-intensity)) rgba(var(--pulse-c1-rgb),.64),inset 0 0 26px rgba(255,255,255,.48);animation:pulseCore var(--pulse-rate) ease-in-out infinite}
+.pulse-core::before{content:"";position:absolute;inset:-40%;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.62) 48%,transparent 60%);transform:translateX(-34%) rotate(8deg);animation:pulseCoreSheen calc(var(--pulse-rate)*1.4) ease-in-out infinite}
+.pulse-core::after{content:"";position:absolute;inset:9px;border-radius:50%;border:1px solid rgba(255,255,255,.36);box-shadow:inset 0 -10px 18px rgba(0,0,0,.22)}
+.pulse-core span{position:absolute;inset:22px;border-radius:50%;background:rgba(255,255,255,.24);box-shadow:0 0 20px rgba(255,255,255,.28);animation:pulseCoreDot calc(var(--pulse-rate)*.66) ease-in-out infinite}
+.pulse-readout{position:absolute;left:18px;right:18px;bottom:16px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;z-index:5}
+.pulse-readout span{padding:10px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.075);background:rgba(255,255,255,.045);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--text-muted);font:.64rem var(--font-mono);letter-spacing:.10em;text-transform:uppercase}
+.pulse-readout strong{display:block;color:var(--text-primary);font:800 .98rem var(--font-primary);letter-spacing:0;text-transform:none;line-height:1.1;margin-bottom:3px}
+.pulse-controls{display:grid;gap:16px;align-content:start}
+.pulse-mode-strip{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.pulse-mode-strip span{display:inline-flex;align-items:center;gap:7px;padding:6px 9px;border-radius:999px;border:1px solid rgba(255,255,255,.075);background:rgba(255,255,255,.04);color:var(--text-muted);font:.66rem var(--font-mono);letter-spacing:.10em;text-transform:uppercase}
+.pulse-mode-strip span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--pulse-c2);box-shadow:0 0 12px var(--pulse-c2)}
+.pulse-control{display:grid;grid-template-columns:90px minmax(0,1fr) 58px;align-items:center;gap:12px}
+.pulse-control label,.pulse-control output,.pulse-controls-label{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.10em;color:var(--text-muted);text-transform:uppercase}
+.pulse-control output{text-align:right;color:var(--text-primary);letter-spacing:0;text-transform:none}
+.pulse-control input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:999px;background:linear-gradient(90deg,rgba(var(--pulse-c1-rgb),.42),rgba(var(--pulse-c2-rgb),.28)),rgba(255,255,255,.10);outline:none}
+.pulse-control input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;border:0;background:#fff;box-shadow:0 0 0 4px rgba(var(--pulse-c1-rgb),.13),0 0 18px var(--pulse-c2);cursor:pointer;transition:transform .14s,box-shadow .14s}
+.pulse-control input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.18);box-shadow:0 0 0 5px rgba(var(--pulse-c1-rgb),.20),0 0 24px var(--pulse-c2)}
+.pulse-control input[type=range]::-moz-range-thumb{width:17px;height:17px;border:0;border-radius:50%;background:#fff;box-shadow:0 0 0 4px rgba(var(--pulse-c1-rgb),.13),0 0 18px var(--pulse-c2);cursor:pointer}
+.pulse-control input[type=range]:focus-visible{box-shadow:0 0 0 3px rgba(var(--pulse-c2-rgb),.38)}
+.pulse-swatches{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.pulse-controls-label{margin-right:auto}.pulse-swatch,.pulse-motion-toggle{width:31px;height:31px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;color:var(--text-primary);display:grid;place-items:center;background:rgba(255,255,255,.08);transition:transform .14s,border-color .14s,box-shadow .14s}.pulse-swatch:hover,.pulse-motion-toggle:hover{transform:scale(1.1)}.pulse-swatch[aria-pressed="true"],.pulse-motion-toggle[aria-pressed="true"]{border-color:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.06),0 0 20px rgba(var(--pulse-c2-rgb),.20)}.pulse-swatch:focus-visible,.pulse-motion-toggle:focus-visible{outline:none;border-color:#fff;box-shadow:0 0 0 3px rgba(var(--pulse-c2-rgb),.34)}
+.pulse-pattern-grid{margin-top:16px;grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.pulse-use-card{min-height:188px}.pulse-status{display:inline-flex;align-items:center;gap:10px;color:var(--text-primary);font-size:.86rem}.pulse-dot{position:relative;width:11px;height:11px;border-radius:50%;background:var(--pulse-c3);box-shadow:0 0 12px var(--pulse-c3)}.pulse-dot::before,.pulse-dot::after{content:"";position:absolute;inset:-2px;border-radius:inherit;border:1px solid var(--pulse-c3);animation:pulseMini calc(var(--pulse-rate)*.95) ease-out infinite}.pulse-dot::after{animation-delay:calc(var(--pulse-rate)*-.36)}
+.pulse-cta{position:relative;border:0;cursor:pointer;padding:12px 20px;border-radius:999px;color:#0B0E14;font:800 .86rem var(--font-primary);background:linear-gradient(105deg,var(--pulse-c2),var(--pulse-c1));isolation:isolate;box-shadow:0 12px 30px rgba(var(--pulse-c1-rgb),.24);overflow:visible}.pulse-cta::before,.pulse-cta::after{content:"";position:absolute;border-radius:inherit;z-index:-1;background:inherit;pointer-events:none}.pulse-cta::before{inset:0;filter:blur(10px);opacity:.68;animation:pulseCta calc(var(--pulse-rate)*.9) ease-out infinite}.pulse-cta::after{inset:-7px;border:1px solid rgba(255,255,255,.34);background:transparent;opacity:0;animation:pulseCtaRing calc(var(--pulse-rate)*1.1) ease-out infinite}.pulse-cta:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.pulse-bell{position:relative;width:50px;height:50px;border-radius:15px;background:rgba(255,255,255,.055);border:1px solid var(--glass-border);display:grid;place-items:center;font-size:20px;color:var(--text-primary);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}.pulse-bell::after{content:"";position:absolute;inset:-7px;border-radius:inherit;border:1px solid rgba(var(--pulse-c2-rgb),.28);opacity:.45;animation:pulseMiniBox calc(var(--pulse-rate)*1.05) ease-out infinite}.pulse-badge{position:absolute;top:-7px;right:-7px;min-width:21px;height:21px;padding:0 6px;border-radius:999px;background:var(--pulse-c1);color:#120719;font:800 .68rem var(--font-mono);display:grid;place-items:center;box-shadow:0 0 20px rgba(var(--pulse-c1-rgb),.42)}.pulse-badge::after{content:"";position:absolute;inset:-2px;border-radius:inherit;border:1px solid var(--pulse-c1);animation:pulseMini calc(var(--pulse-rate)*.72) ease-out infinite}
+.pulse-meter{display:grid;gap:8px;width:100%;max-width:210px}.pulse-meter__top{display:flex;justify-content:space-between;color:var(--text-primary);font:.74rem var(--font-mono)}.pulse-meter__track{position:relative;height:8px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.06)}.pulse-meter__fill{position:absolute;inset:0 18% 0 0;border-radius:inherit;background:linear-gradient(90deg,var(--pulse-c1),var(--pulse-c2),var(--pulse-c3));box-shadow:0 0 22px rgba(var(--pulse-c2-rgb),.32)}.pulse-meter__fill::after{content:"";position:absolute;inset:0;width:38%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.62),transparent);animation:pulseMeterSheen calc(var(--pulse-rate)*.9) ease-in-out infinite}.pulse-meter__ping{position:absolute;right:18%;top:50%;width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 16px var(--pulse-c2);transform:translate(50%,-50%)}.pulse-meter__ping::after{content:"";position:absolute;inset:-4px;border-radius:inherit;border:1px solid var(--pulse-c2);animation:pulseMini calc(var(--pulse-rate)*.8) ease-out infinite}
+#motion.is-pulse-paused *{animation-play-state:paused!important}
+@keyframes pulseSpin{to{transform:rotate(360deg)}}@keyframes pulseOrbit{to{transform:rotate(360deg)}}
+@keyframes pulseRing{0%{transform:scale(.78);opacity:calc(.86*var(--pulse-intensity))}58%{opacity:calc(.22*var(--pulse-intensity))}100%{transform:scale(var(--pulse-reach));opacity:0}}
+@keyframes pulseCore{0%,100%{transform:scale(1);filter:brightness(1)}38%{transform:scale(1.13);filter:brightness(1.25)}58%{transform:scale(1.04);filter:brightness(1.08)}}
+@keyframes pulseCoreSheen{0%,42%{transform:translateX(-52%) rotate(8deg);opacity:0}58%{opacity:.88}100%{transform:translateX(52%) rotate(8deg);opacity:0}}@keyframes pulseCoreDot{0%,100%{opacity:.22;transform:scale(.82)}50%{opacity:.62;transform:scale(1.12)}}
+@keyframes pulseAura{0%,100%{transform:scale(.90);opacity:calc(.30*var(--pulse-intensity))}50%{transform:scale(1.18);opacity:calc(.52*var(--pulse-intensity))}}@keyframes pulseInnerAura{0%,100%{transform:scale(.82);opacity:.42}50%{transform:scale(1.10);opacity:.72}}
+@keyframes pulseGround{0%,100%{transform:scaleX(.82);opacity:calc(.32*var(--pulse-intensity))}50%{transform:scaleX(1.08);opacity:calc(.58*var(--pulse-intensity))}}@keyframes pulseLed{0%,100%{opacity:.46;transform:scale(.84)}50%{opacity:1;transform:scale(1.1)}}
+@keyframes pulseMapDrift{to{transform:rotate(1turn)}}@keyframes pulseScanline{0%,100%{transform:translateY(-112px);opacity:0}16%{opacity:.76}50%{opacity:.42}84%{opacity:.76}100%{transform:translateY(112px);opacity:0}}
+@keyframes pulseMini{0%{transform:scale(1);opacity:.88}100%{transform:scale(3.15);opacity:0}}@keyframes pulseMiniBox{0%{transform:scale(.88);opacity:.46}100%{transform:scale(1.5);opacity:0}}@keyframes pulseCta{0%{transform:scale(1);opacity:.62}100%{transform:scale(1.48);opacity:0}}@keyframes pulseCtaRing{0%{transform:scale(.92);opacity:.58}100%{transform:scale(1.38);opacity:0}}@keyframes pulseMeterSheen{0%{transform:translateX(-130%)}100%{transform:translateX(280%)}}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  body::before{display:none}
+  .wrap{transition:none}
+  .click-wave{width:96px;height:96px}
+  .click-wave__halo{animation:clickHaloReduced .22s ease-out forwards}
+  .click-wave__ring,.click-wave__sweep,.click-wave__flash,.click-wave__spark{display:none}
+  .is-ripple-source{animation:none}
+  .card.is-selected,.panel.is-selected{transform:none}
+  .pulse-showcase *,.pulse-pattern-grid *{animation:none!important}
+  .pulse-sweep{opacity:.24}.pulse-rings span{opacity:.16;transform:scale(2.4)}.pulse-map::after{display:none}
+  @keyframes clickHaloReduced{0%{opacity:.28;transform:scale(.72)}100%{opacity:0;transform:scale(1)}}
+}
+@media(max-width:1120px){.pulse-pattern-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:1020px){.grid.two,.grid.three,.metric-row,.metric-row.five,.pulse-showcase{grid-template-columns:1fr}.pulse-hero{min-height:380px}.pulse-pattern-grid{grid-template-columns:1fr!important}}
+@media(max-width:700px){.pulse-control{grid-template-columns:76px minmax(0,1fr) 50px}.pulse-hero{padding:22px 12px 18px;min-height:430px}.pulse-beacon{width:248px;height:248px}.pulse-readout{grid-template-columns:1fr;left:12px;right:12px}.pulse-frequency{left:12px;top:12px}.pulse-map{inset:12px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="eyebrow">PULS frontend</div>
+    <h1>Component Library Handoff</h1>
+    <p>Tohle je hlavní review dokument. Nejdřív kontroluj tenhle soubor. Detailní `component-*.html` showcase soubory jsou až druhá vrstva, když potřebuješ hlubší rozpad patternu. Teď už jsou tady pohromadě quiet core, brand accents, day detail, shared app patterns i page blueprints.</p>
+    <nav class="toc">
+      <a href="#core">Quiet Core</a>
+      <a href="#brand">Brand Accents</a>
+      <a href="#motion">Motion / Pulse</a>
+      <a href="#day">Day View</a>
+      <a href="#shared">Shared App</a>
+      <a href="#blueprints">Blueprints</a>
+    </nav>
+  </header>
+
+  <section class="section" id="core">
+    <div class="section-head">
+      <div class="section-label">Shared layer</div>
+      <div class="section-title">Quiet Core</div>
+      <p class="section-copy">Default systém pro většinu aplikace. Vychází z `studium-final`: glass surfaces, jemný border, hezký hover přes `glass-2 + border-strong + translateY(-1px)`, ale bez agresivního glowa jako defaultu.</p>
+    </div>
+    <div class="grid three">
+      <div class="card">
+        <div class="mini">Surface card</div>
+        <div class="title">Malá karta</div>
+        <div class="body">Tasky, tiles, score cards, kompaktní obsahové bloky.</div>
+        <div class="rule-box">hover = `background: glass-2`, `border-color: glass-border-strong`, `transform: translateY(-1px)`</div>
+      </div>
+      <div class="panel">
+        <div class="mini">Surface panel</div>
+        <div class="title">Větší panel</div>
+        <div class="body">Sidebar bloky, checklisty, kalendář, glossary drawer, utility panely.</div>
+        <div class="rule-box">Panel může mít bohatší obsah, ale pořád drží stejný hover language jako card.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">Utility</div>
+        <div class="title">Shared UI primitives</div>
+        <div class="body">Meta label, XP pill, icon button, search input, segmented tabs.</div>
+        <div style="margin-top:10px" class="token">+40 b</div>
+      </div>
+    </div>
+    <div class="link-row"><a href="./component-primitives.html">Detail primitives</a></div>
+  </section>
+
+  <section class="section" id="brand">
+    <div class="section-head">
+      <div class="section-label">Special layer</div>
+      <div class="section-title">Brand Accents</div>
+      <p class="section-copy">Fialový glow a purple tint nikam nemizí. Jen nejsou default na všem. Patří do hero, selected a featured stavů. Sebastianův závěr: slabá fialová typografie na tmě nestačí, nosný kontrast musí dělat `text-primary`.</p>
+    </div>
+    <div class="grid two">
+      <div class="panel accent-card">
+        <div class="mini">Hero surface</div>
+        <div class="title">DayHeader / featured shell</div>
+        <div class="body">Glow, accent surface a brand emphasis patří sem, ne do běžných tasků a row patterns.</div>
+        <div class="rule-box">background: linear-gradient(135deg, rgba(141,42,243,0.12), transparent 58%), var(--glass-2)<br>border: 1px solid rgba(141,42,243,0.24)</div>
+      </div>
+      <div class="panel">
+        <div class="mini">Allowed uses</div>
+        <div class="list">
+          <div class="li"><span>Aktivní top nav</span><span>ano</span></div>
+          <div class="li"><span>Selected day tile</span><span>ano</span></div>
+          <div class="li"><span>TaskCard default</span><span>ne</span></div>
+          <div class="li"><span>QuestRow default</span><span>ne</span></div>
+        </div>
+        <div class="rule-box">Purple text na tmavém backgroundu nikdy nenechávej jako jediný kontrastní signál. Aktivní a důležité texty mají jít do `text-primary`, fialová zůstává accent.</div>
+      </div>
+    </div>
+    <div class="link-row"><a href="./component-brand-accents.html">Detail brand accents</a></div>
+  </section>
+
+  <section class="section pulse-section" id="motion">
+    <div class="section-head">
+      <div class="section-label">Motion layer</div>
+      <div class="section-title">Signal Beacon / Pulse System</div>
+      <p class="section-copy">Tady už puls není jen dekorace. Je to systém pro aktivní stav, klikovou odezvu, live signal, notifikace a dominantní CTA. Reference měla sonarové kruhy, sweep, core puls a ovládání tempa/síly/dosahu; tady je z toho sjednocená motion vrstva pro celou component library.</p>
+    </div>
+    <div class="pulse-showcase" id="pulseShowcase">
+      <div class="pulse-hero">
+        <div class="pulse-frequency">Signal lock · 03.00 s</div>
+        <div class="pulse-map" aria-hidden="true"></div>
+        <div class="pulse-beacon" aria-label="Ukázka prémiového sonarového pulse beacon efektu" role="img">
+          <div class="pulse-axis" aria-hidden="true"></div>
+          <div class="pulse-sweep" aria-hidden="true"></div>
+          <div class="pulse-orbit pulse-orbit--outer" aria-hidden="true"></div>
+          <div class="pulse-orbit pulse-orbit--mid" aria-hidden="true"></div>
+          <div class="pulse-orbit pulse-orbit--inner" aria-hidden="true"></div>
+          <div class="pulse-rings" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="pulse-nodes" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+          <div class="pulse-core"><span aria-hidden="true"></span></div>
+        </div>
+        <div class="pulse-readout" aria-hidden="true">
+          <span><strong>98%</strong> resonance</span>
+          <span><strong>12 ms</strong> response</span>
+          <span><strong>live</strong> health</span>
+        </div>
+      </div>
+      <div class="panel pulse-controls">
+        <div>
+          <div class="mini">Interactive controls</div>
+          <div class="title">Ladění pohybu jako design token</div>
+          <div class="body">Tempo, síla, dosah a paleta běží přes CSS variables. Změna palety se promítne i do globální klikové vlny, takže motion nepůsobí jako izolovaný demo prvek.</div>
+          <div class="pulse-mode-strip" aria-hidden="true"><span>tap wave</span><span>live status</span><span>selected state</span></div>
+        </div>
+        <div class="pulse-control">
+          <label for="pulseRate">Tempo</label>
+          <input id="pulseRate" type="range" min="1.4" max="5.8" step="0.1" value="3.0">
+          <output id="pulseRateOut">3.0 s</output>
+        </div>
+        <div class="pulse-control">
+          <label for="pulseIntensity">Síla</label>
+          <input id="pulseIntensity" type="range" min="0.35" max="1.55" step="0.05" value="1">
+          <output id="pulseIntensityOut">100 %</output>
+        </div>
+        <div class="pulse-control">
+          <label for="pulseReach">Dosah</label>
+          <input id="pulseReach" type="range" min="2.6" max="7.2" step="0.2" value="5.2">
+          <output id="pulseReachOut">5.2×</output>
+        </div>
+        <div class="pulse-swatches">
+          <span class="pulse-controls-label">Paleta</span>
+          <button type="button" class="pulse-swatch" aria-label="PULS violet cyan" aria-pressed="true" title="PULS violet + cyan" style="background:linear-gradient(120deg,#8D2AF3,#22D3EE,#10B981)" data-pulse-c1="#8D2AF3" data-pulse-c2="#22D3EE" data-pulse-c3="#10B981" data-pulse-c1-rgb="141,42,243" data-pulse-c2-rgb="34,211,238" data-pulse-c3-rgb="16,185,129"></button>
+          <button type="button" class="pulse-swatch" aria-label="Cyan pink" aria-pressed="false" title="Cyan + pink" style="background:linear-gradient(120deg,#22D3EE,#F472B6,#8D2AF3)" data-pulse-c1="#F472B6" data-pulse-c2="#22D3EE" data-pulse-c3="#8D2AF3" data-pulse-c1-rgb="244,114,182" data-pulse-c2-rgb="34,211,238" data-pulse-c3-rgb="141,42,243"></button>
+          <button type="button" class="pulse-swatch" aria-label="Lime emerald" aria-pressed="false" title="Lime + emerald" style="background:linear-gradient(120deg,#A3E635,#10B981,#22C55E)" data-pulse-c1="#A3E635" data-pulse-c2="#10B981" data-pulse-c3="#22C55E" data-pulse-c1-rgb="163,230,53" data-pulse-c2-rgb="16,185,129" data-pulse-c3-rgb="34,197,94"></button>
+          <button type="button" class="pulse-swatch" aria-label="Amber rose" aria-pressed="false" title="Amber + rose" style="background:linear-gradient(120deg,#FBBF24,#FB7185,#F97316)" data-pulse-c1="#FB7185" data-pulse-c2="#FBBF24" data-pulse-c3="#F97316" data-pulse-c1-rgb="251,113,133" data-pulse-c2-rgb="251,191,36" data-pulse-c3-rgb="249,115,22"></button>
+          <button type="button" id="pulseStill" class="pulse-motion-toggle" aria-pressed="false" title="Pozastavit animaci">Ⅱ</button>
+        </div>
+        <div class="rule-box">Usage rule: silný beacon jen pro živý, vybraný nebo urgentní stav. Mikropulsy patří do statusu, badge a CTA; default karty zůstávají quiet core, jinak se vizuální hierarchie rozpadne.</div>
+      </div>
+    </div>
+    <div class="grid three pulse-pattern-grid">
+      <div class="card pulse-use-card">
+        <div class="mini">Live status</div>
+        <div class="title">Lokální heartbeat</div>
+        <div class="body"><span class="pulse-status"><span class="pulse-dot"></span> Online · vysílá</span></div>
+        <div class="rule-box">Malý puls signalizuje aktivní službu, ne běžný statický label.</div>
+      </div>
+      <div class="card pulse-use-card">
+        <div class="mini">Primary action</div>
+        <div class="title">CTA s dýchajícím halo</div>
+        <div class="body"><button type="button" class="pulse-cta">Připojit signál</button></div>
+        <div class="rule-box">Jedna dominantní akce v daném view. Ne na každé tlačítko.</div>
+      </div>
+      <div class="card pulse-use-card">
+        <div class="mini">Notification</div>
+        <div class="title">Badge s výstupním pingem</div>
+        <div class="body"><span class="pulse-bell">🔔<span class="pulse-badge">3</span></span></div>
+        <div class="rule-box">Puls má upozornit na změnu, ne soutěžit s navigací.</div>
+      </div>
+      <div class="card pulse-use-card">
+        <div class="mini">Progress signal</div>
+        <div class="title">Měřák se špičkou signálu</div>
+        <div class="body">
+          <div class="pulse-meter">
+            <div class="pulse-meter__top"><span>Sync</span><strong>82%</strong></div>
+            <div class="pulse-meter__track"><span class="pulse-meter__fill"></span><span class="pulse-meter__ping"></span></div>
+          </div>
+        </div>
+        <div class="rule-box">Použít pro běžící proces: sync, upload, scan, health check.</div>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="section" id="day">
+    <div class="section-head">
+      <div class="section-label">Detail page system</div>
+      <div class="section-title">Day Content View Components</div>
+      <p class="section-copy">Tady se skládá detail dne: hero, obsahové tasky, quest sidebar a glossary vrstva. Rozdíl mezi quiet core a selected/done stavy musí být dobře vidět, ale nesmí přepadnout do overdesignu.</p>
+    </div>
+    <div class="grid three">
+      <div class="card accent-card">
+        <div class="mini">DayHeader</div>
+        <div class="title">Hero detail dne</div>
+        <div class="body">Speciální header pattern se silnější brand expresí. Musí být stručný, operativní a bez opakování stejné informace v několika vrstvách.</div>
+        <div class="rule-box">Header detailu dne má nést jen jednu navigační vrstvu, jednu stručnou větu o dnešku, jedno meta pásmo a jednu jasnou primary akci. Neopakuj den kurzu, výstup ani stav dne v dalších dekoračních blocích.</div>
+      </div>
+      <div class="card">
+        <div class="mini">TaskCard</div>
+        <div class="title">Obsah dne</div>
+        <div class="body">Tichá obsahová karta. Volitelné listy a code block.</div>
+        <div class="rule-box">Hover je schválně hezký a živý jako v referenci. Žádný barevný pruh jako default, ale ani mrtvá karta bez reakce.</div>
+      </div>
+      <div class="card">
+        <div class="mini">QuestRow</div>
+        <div class="title">Denní sidebar row</div>
+        <div class="body">Krátký checklist pattern s XP a lehkým done stavem.</div>
+        <div class="quest-row" style="margin-top:12px">
+          <span class="quest-row__box"></span>
+          <span class="quest-row__title">Přečíst příručku</span>
+          <span class="token">+30 b</span>
+        </div>
+        <div class="quest-row is-done" style="margin-top:6px">
+          <span class="quest-row__box"></span>
+          <span class="quest-row__title">Napsat manifest „Proč Claude“</span>
+          <span class="token" style="color:var(--success);background:var(--success-bg);border-color:var(--success-border)">+60 b</span>
+        </div>
+        <div class="rule-box">Default XP pill je utlumený. Done stav smí zesílit tint i pill, aby reward byl opravdu čitelný.</div>
+      </div>
+      <div class="card">
+        <div class="mini">GlossaryTermAccordion</div>
+        <div class="title">Knowledge row</div>
+        <div class="body">Lehký accordion item, ne card-in-card pattern.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">GlossaryDrawer</div>
+        <div class="title">Knowledge panel</div>
+        <div class="body">Search, tabs a list termů v pravém utilitárním draweru.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">Sidebar contract</div>
+        <div class="title">Pracovní pomoc, ne archiv</div>
+        <div class="body">Sidebar detailu dne drží questy, habits, pokrok a glossary utility. Referenční zdroje nejsou default obsah sidebaru.</div>
+        <div class="rule-box">U Dne 1 je správný empty state pro předešlé lekce. Další dny už tento blok přechází do reálného pokrokového panelu.</div>
+      </div>
+    </div>
+    <div class="link-row">
+      <a href="./component-day-header.html">DayHeader</a>
+      <a href="./component-task-card.html">TaskCard</a>
+      <a href="./component-quest-row.html">QuestRow</a>
+      <a href="./component-glossary-term-accordion.html">GlossaryTermAccordion</a>
+      <a href="./component-glossary-drawer.html">GlossaryDrawer</a>
+    </div>
+    <div class="rule-box" style="margin-top:14px">Day detail rule: jedna informace = jeden nosič. Stav dne, výstup dne a completion summary se nesmí opakovat v pillech, meta řádcích, hero textu a dalších blocích zároveň.</div>
+  </section>
+
+  <section class="section" id="shared">
+    <div class="section-head">
+      <div class="section-label">App-level patterns</div>
+      <div class="section-title">Shared App Components</div>
+      <p class="section-copy">Patterny odchycené z aktuálních Planner, Studium, Profile a Meets obrazovek, které dává smysl znovu použít napříč aplikací. Tady už nestačí jen “mini ukázka”; u důležitých patternů ukazuju rovnou i chování a usage rules.</p>
+    </div>
+    <div class="grid three">
+      <div class="panel">
+        <div class="nav-preview">
+        <div>
+          <div class="mini">TopAppShell</div>
+          <div class="title">App header a nav cluster</div>
+          <div class="body">Samostatný glass shell s vlastní hloubkou. Nesmí se ztratit do okolního panelu jako duch.</div>
+        </div>
+        <div class="pill-nav"><span class="active">Planner</span><span>Studium</span><span>Meets</span></div>
+        </div>
+        <div class="rule-box">Vrstva 1 = outer shell s blur a shadow. Vrstva 2 = nav cluster. Vrstva 3 = active item s button feeling. Právě tahle trojvrstva drží hloubku reference.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">SectionShell</div>
+        <div class="title">Page container</div>
+        <div class="body">Velký page blok se section headerem a vnitřním layoutem.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">ProgressDonutCard</div>
+        <div class="title">Kruhový progress panel</div>
+        <div class="body">Status, dokončeno, cíl a den kurzu.</div>
+        <div style="margin-top:14px" class="donut"><strong>0</strong></div>
+      </div>
+      <div class="panel">
+        <div class="mini">StatStrip</div>
+        <div class="title">Přehled průběhu</div>
+        <div class="body">Horizontální souhrn pro kurz, dny a body.</div>
+        <div class="rule-box">Podle reference může mít lehký purple-tinted background nebo accent border, ale text musí zůstat v `text-primary` / `text-secondary`.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">InfoMetricCard</div>
+        <div class="title">Malý metrický blok</div>
+        <div class="body">Délka, tempo, milník, splněno.</div>
+      </div>
+      <div class="card">
+        <div class="mini">CoursePlanCard</div>
+        <div class="title">Přehled plánu</div>
+        <div class="body">Tier/plan overview karta pro studijní přehled.</div>
+      </div>
+      <div class="card day-tile">
+        <div class="mini">DayTile</div>
+        <div class="title">Den 1</div>
+        <div class="body">Přehledová denní karta v týdenním gridu. Odlišná od TaskCard.</div>
+        <div class="rule-box">Selected state může nést purple tint a accent border. Hover zůstává ve stejném jazyce jako course-day-card v referenci.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">ChecklistPanel</div>
+        <div class="title">Panelový seznam</div>
+        <div class="body">Širší dashboardový list s title, subline a XP/časem.</div>
+        <div class="rule-box">Je interaktivní. Každý řádek musí mít hover, pointer a čitelný actionable state.</div>
+        <div class="checklist-row">
+          <div class="box"></div>
+          <div>
+            <div class="check-title">Týdenní report s Claudem</div>
+            <div class="check-sub">Claude Cowork, Excel, PowerPoint a Microsoft 365</div>
+          </div>
+          <div class="token">+80 b</div>
+        </div>
+        <div class="checklist-row">
+          <div class="box"></div>
+          <div>
+            <div class="check-title">Týdenní thinking výzva</div>
+            <div class="check-sub">Extended Thinking</div>
+          </div>
+          <div class="token">+60 b</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="mini">CalendarPanel</div>
+        <div class="title">Minikalendář</div>
+        <div class="body">Výběr dne a denní přehled položek.</div>
+      </div>
+      <div class="card">
+        <div class="mini">TopicScoreCard</div>
+        <div class="title">Tematická skóre</div>
+        <div class="body">Přehled oblasti a bodového zisku.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">PomodoroPanel</div>
+        <div class="title">Timer blok</div>
+        <div class="body">Časovač s primárním a sekundárním CTA.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">AgendaPanel</div>
+        <div class="title">Agenda / checklist</div>
+        <div class="body">Panel s meeting checklistem a sekundárním metadatovým blokem.</div>
+      </div>
+      <div class="panel">
+        <div class="mini">ToolIconBar</div>
+        <div class="title">Ovládací lišta</div>
+        <div class="body">Kompaktní řada ikonových ovladačů s active/hover stavy.</div>
+      </div>
+      <div class="panel accent-card">
+        <div class="mini">MeetingLaunchPanel</div>
+        <div class="title">Launch a room identity</div>
+        <div class="body">Room identity, status a hlavní CTA pro spuštění schůzky.</div>
+      </div>
+    </div>
+    <div class="link-row">
+      <a href="./component-top-app-shell.html">TopAppShell</a>
+      <a href="./component-section-shell.html">SectionShell</a>
+      <a href="./component-stat-strip.html">StatStrip</a>
+      <a href="./component-progress-donut-card.html">ProgressDonutCard</a>
+      <a href="./component-info-metric-card.html">InfoMetricCard</a>
+      <a href="./component-course-plan-card.html">CoursePlanCard</a>
+      <a href="./component-day-tile.html">DayTile</a>
+      <a href="./component-checklist-panel.html">ChecklistPanel</a>
+      <a href="./component-calendar-panel.html">CalendarPanel</a>
+      <a href="./component-topic-score-card.html">TopicScoreCard</a>
+      <a href="./component-pomodoro-panel.html">PomodoroPanel</a>
+      <a href="./component-agenda-panel.html">AgendaPanel</a>
+      <a href="./component-tool-icon-bar.html">ToolIconBar</a>
+      <a href="./component-meeting-launch-panel.html">MeetingLaunchPanel</a>
+    </div>
+  </section>
+
+  <section class="section" id="blueprints">
+    <div class="section-head">
+      <div class="section-label">Composition</div>
+      <div class="section-title">Page Blueprints</div>
+      <p class="section-copy">Dokumentované kompoziční návrhy pro reálné stránky. Z těchto blueprintů by měl vývojář být schopný začít skládat obrazovky bez dalších designových otázek.</p>
+    </div>
+    <div class="metric-row five">
+      <div class="card">
+        <div class="mini">Implemented page</div>
+        <div class="title">Day Content View</div>
+        <div class="body">Hotová složená obrazovka: DayHeader, task list, QuestRow panel, glossary vrstva a funkční drawer interakce.</div>
+      </div>
+      <div class="card"><div class="mini">Blueprint</div><div class="title">Planner Overview</div><div class="body">Stat strip, checklist panels, progress a utility side panels.</div></div>
+      <div class="card"><div class="mini">Blueprint</div><div class="title">Study Plan Overview</div><div class="body">SectionShell, plan cards, metrics a day tile grid.</div></div>
+      <div class="card"><div class="mini">Blueprint</div><div class="title">Profile Topics Overview</div><div class="body">Grid topic score cards a související summary shell.</div></div>
+      <div class="card"><div class="mini">Blueprint</div><div class="title">Meets Control View</div><div class="body">Meeting launch panel, agenda, tool icon bar a side utility workflow.</div></div>
+    </div>
+    <div class="rule-box">Review workflow: pro rychlou kontrolu otevři nejdřív jen tento soubor. Detailní `component-*.html` showcase soubory řeš až ve chvíli, kdy potřebuješ hlubší rozpad konkrétního patternu.</div>
+    <div class="link-row">
+      <a href="./day-content-view.html">Otevřít Day Content View</a>
+      <a href="./page-blueprints.md">Otevřít page blueprints</a>
+    </div>
+  </section>
+</div>
+<script>
+(() => {
+  const CLICKABLE_SELECTOR = 'a,button,input,select,textarea,[role="button"],[tabindex],.quest-row,.checklist-row,.card,.panel,.pill-nav span';
+  const WAVE_MS = 860;
+  const SELECTED_MS = 1240;
+  const WAVE_BASE_RADIUS = 84;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  let waveLayer = document.querySelector('.click-wave-layer');
+  let activeWave = null;
+  let waveTimer = 0;
+  let sourceTimer = 0;
+  let selectedTimer = 0;
+  let navigationTimer = 0;
+  let rippleSource = null;
+  let selectedSurface = null;
+
+  if (!waveLayer) {
+    waveLayer = document.createElement('div');
+    waveLayer.className = 'click-wave-layer';
+    waveLayer.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(waveLayer);
+  }
+
+  const clearWaveState = () => {
+    document.body.classList.remove('is-wave-active');
+    if (activeWave) {
+      activeWave.remove();
+      activeWave = null;
+    }
+  };
+
+  const getWaveMetrics = (x, y) => {
+    if (reducedMotion.matches) return { scale: 1, haloScale: 1, sweepScale: 1, angle: 0 };
+    const maxX = Math.max(x, window.innerWidth - x);
+    const maxY = Math.max(y, window.innerHeight - y);
+    const distance = Math.hypot(maxX, maxY);
+    const scale = Math.max(1, Math.ceil(distance / WAVE_BASE_RADIUS));
+    const dx = x - window.innerWidth / 2;
+    const dy = y - window.innerHeight / 2;
+    const angle = Math.round((Math.atan2(dy, dx) * 180 / Math.PI + 360) % 360);
+    return { scale, haloScale: scale * 1.18, sweepScale: scale * 1.05, angle };
+  };
+
+  const appendPart = (wave, className) => {
+    const part = document.createElement('span');
+    part.className = className;
+    wave.appendChild(part);
+    return part;
+  };
+
+  const addSparks = (wave, angle) => {
+    if (reducedMotion.matches) return;
+    const count = 12;
+    const angleOffset = angle * Math.PI / 180;
+    for (let i = 0; i < count; i += 1) {
+      const spark = appendPart(wave, 'click-wave__spark');
+      const theta = (i / count) * Math.PI * 2 + angleOffset * 0.18;
+      const distance = 54 + (i % 4) * 13;
+      spark.style.setProperty('--spark-x', `${Math.cos(theta) * distance}px`);
+      spark.style.setProperty('--spark-y', `${Math.sin(theta) * distance}px`);
+      spark.style.setProperty('--spark-size', `${3 + (i % 3)}px`);
+      spark.style.setProperty('--spark-delay', `${i * 0.012}s`);
+    }
+  };
+
+  const startWave = (x, y) => {
+    window.clearTimeout(waveTimer);
+    clearWaveState();
+
+    const metrics = getWaveMetrics(x, y);
+    const wave = document.createElement('span');
+    wave.className = 'click-wave';
+    wave.setAttribute('aria-hidden', 'true');
+    wave.style.setProperty('--wave-x', `${x}px`);
+    wave.style.setProperty('--wave-y', `${y}px`);
+    wave.style.setProperty('--wave-scale', metrics.scale);
+    wave.style.setProperty('--wave-halo-scale', metrics.haloScale);
+    wave.style.setProperty('--wave-sweep-scale', metrics.sweepScale);
+    wave.style.setProperty('--wave-angle', `${metrics.angle}deg`);
+
+    appendPart(wave, 'click-wave__halo');
+    appendPart(wave, 'click-wave__ring click-wave__ring--a');
+    appendPart(wave, 'click-wave__ring click-wave__ring--b');
+    appendPart(wave, 'click-wave__ring click-wave__ring--c');
+    appendPart(wave, 'click-wave__sweep');
+    appendPart(wave, 'click-wave__flash');
+    addSparks(wave, metrics.angle);
+
+    document.body.style.setProperty('--wave-x', `${x}px`);
+    document.body.style.setProperty('--wave-y', `${y}px`);
+    document.body.style.setProperty('--wave-angle', `${metrics.angle}deg`);
+    waveLayer.appendChild(wave);
+    activeWave = wave;
+    document.body.classList.add('is-wave-active');
+
+    waveTimer = window.setTimeout(clearWaveState, reducedMotion.matches ? 240 : WAVE_MS);
+  };
+
+  const setLocalPulseOrigin = (target, x, y) => {
+    if (!target || typeof target.getBoundingClientRect !== 'function') return;
+    const rect = target.getBoundingClientRect();
+    target.style.setProperty('--local-x', `${x - rect.left}px`);
+    target.style.setProperty('--local-y', `${y - rect.top}px`);
+  };
+
+  const markRippleSource = (target, x, y) => {
+    if (rippleSource) rippleSource.classList.remove('is-ripple-source');
+    window.clearTimeout(sourceTimer);
+    rippleSource = target;
+    setLocalPulseOrigin(rippleSource, x, y);
+    rippleSource.classList.add('is-ripple-source');
+    sourceTimer = window.setTimeout(() => {
+      if (rippleSource) rippleSource.classList.remove('is-ripple-source');
+      rippleSource = null;
+    }, reducedMotion.matches ? 260 : 780);
+  };
+
+  const pulseSelected = (target, x, y) => {
+    if (!target) return;
+    if (selectedSurface) selectedSurface.classList.remove('is-selected');
+    window.clearTimeout(selectedTimer);
+    selectedSurface = target;
+    setLocalPulseOrigin(selectedSurface, x, y);
+    selectedSurface.classList.add('is-selected');
+    selectedTimer = window.setTimeout(() => {
+      if (selectedSurface) selectedSurface.classList.remove('is-selected');
+      selectedSurface = null;
+    }, reducedMotion.matches ? 320 : SELECTED_MS);
+  };
+
+  const toggleDoneAfterWave = (target) => {
+    window.setTimeout(() => target.classList.toggle('is-done'), reducedMotion.matches ? 160 : Math.round(WAVE_MS * 0.72));
+  };
+
+  const applyContextTransform = (target, x, y) => {
+    const questRow = target.closest('.quest-row');
+    if (questRow) {
+      pulseSelected(questRow, x, y);
+      toggleDoneAfterWave(questRow);
+      return;
+    }
+
+    const checklistRow = target.closest('.checklist-row');
+    if (checklistRow) {
+      pulseSelected(checklistRow, x, y);
+      toggleDoneAfterWave(checklistRow);
+      return;
+    }
+
+    const pillItem = target.matches('.pill-nav span') ? target : target.closest('.pill-nav span');
+    if (pillItem) {
+      const nav = pillItem.closest('.pill-nav');
+      nav.querySelectorAll('span').forEach((item) => item.classList.toggle('active', item === pillItem));
+      pulseSelected(pillItem, x, y);
+      return;
+    }
+
+    pulseSelected(target.closest('.card,.panel'), x, y);
+  };
+
+  const decodeHash = (hash) => {
+    try {
+      return decodeURIComponent(hash.slice(1));
+    } catch {
+      return hash.slice(1);
+    }
+  };
+
+  const followLink = (link) => {
+    const rawHref = link.getAttribute('href');
+    if (!rawHref || rawHref === '#') return;
+
+    const url = new URL(link.href, window.location.href);
+    const sameDocument = url.pathname === window.location.pathname && url.search === window.location.search;
+
+    if (url.hash && sameDocument) {
+      const id = decodeHash(url.hash);
+      const hashTarget = document.getElementById(id) || document.getElementsByName(id)[0];
+      if (hashTarget) {
+        hashTarget.scrollIntoView({ behavior: reducedMotion.matches ? 'auto' : 'smooth', block: 'start' });
+        history.pushState(null, '', url.hash);
+        return;
+      }
+    }
+
+    window.location.href = link.href;
+  };
+
+  const motionSection = document.getElementById('motion');
+  const pulseShowcase = document.getElementById('pulseShowcase');
+
+  if (motionSection && pulseShowcase) {
+    const frequency = motionSection.querySelector('.pulse-frequency');
+    const setPulseVar = (name, value) => {
+      motionSection.style.setProperty(name, value);
+    };
+
+    const bindPulseRange = (id, outId, cssVar, unit, format) => {
+      const input = document.getElementById(id);
+      const output = document.getElementById(outId);
+      if (!input || !output) return;
+
+      const update = () => {
+        setPulseVar(cssVar, `${input.value}${unit}`);
+        output.textContent = format(Number(input.value));
+        if (id === 'pulseRate' && frequency) frequency.textContent = `Signal lock · ${Number(input.value).toFixed(2)} s`;
+      };
+
+      input.addEventListener('input', update);
+      update();
+    };
+
+    bindPulseRange('pulseRate', 'pulseRateOut', '--pulse-rate', 's', (value) => `${value.toFixed(1)} s`);
+    bindPulseRange('pulseIntensity', 'pulseIntensityOut', '--pulse-intensity', '', (value) => `${Math.round(value * 100)} %`);
+    bindPulseRange('pulseReach', 'pulseReachOut', '--pulse-reach', '', (value) => `${value.toFixed(1)}×`);
+
+    const swatches = pulseShowcase.querySelectorAll('.pulse-swatch[data-pulse-c1]');
+    const applyPalette = (swatch) => {
+      const targets = [motionSection, document.documentElement];
+      targets.forEach((scope) => {
+        scope.style.setProperty('--pulse-c1', swatch.dataset.pulseC1);
+        scope.style.setProperty('--pulse-c2', swatch.dataset.pulseC2);
+        scope.style.setProperty('--pulse-c3', swatch.dataset.pulseC3);
+        scope.style.setProperty('--pulse-c1-rgb', swatch.dataset.pulseC1Rgb);
+        scope.style.setProperty('--pulse-c2-rgb', swatch.dataset.pulseC2Rgb);
+        scope.style.setProperty('--pulse-c3-rgb', swatch.dataset.pulseC3Rgb);
+      });
+    };
+
+    swatches.forEach((swatch) => {
+      swatch.addEventListener('click', () => {
+        swatches.forEach((item) => item.setAttribute('aria-pressed', 'false'));
+        swatch.setAttribute('aria-pressed', 'true');
+        applyPalette(swatch);
+      });
+    });
+
+    const still = document.getElementById('pulseStill');
+    if (still) {
+      still.addEventListener('click', () => {
+        const paused = motionSection.classList.toggle('is-pulse-paused');
+        still.setAttribute('aria-pressed', paused ? 'true' : 'false');
+        still.textContent = paused ? '▶' : 'Ⅱ';
+      });
+    }
+  }
+
+  document.addEventListener('click', (event) => {
+    if (event.button !== 0) return;
+
+    const target = event.target.closest(CLICKABLE_SELECTOR);
+    if (!target || !document.body.contains(target) || target.closest('.click-wave-layer')) return;
+
+    const link = target.closest('a');
+    const modifiedLinkClick = link && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target === '_blank' || link.hasAttribute('download'));
+    if (modifiedLinkClick) return;
+
+    window.clearTimeout(navigationTimer);
+    startWave(event.clientX, event.clientY);
+    markRippleSource(target, event.clientX, event.clientY);
+    applyContextTransform(target, event.clientX, event.clientY);
+
+    if (link) {
+      event.preventDefault();
+      navigationTimer = window.setTimeout(() => followLink(link), reducedMotion.matches ? 180 : WAVE_MS);
+    }
+  });
+})();
+</script>
+</body>
+</html>
