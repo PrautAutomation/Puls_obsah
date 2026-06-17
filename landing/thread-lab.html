@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PULS Thread Lab v2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --thread-violet: #8D2AF3;
+      --thread-cyan: #22D3EE;
+      --thread-gold: #F5A623;
+      --surface-1: rgba(255,255,255,0.04);
+      --surface-2: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+      --border-strong: rgba(255,255,255,0.14);
+      --text: #F4F6FA;
+      --text-muted: #A4ACBE;
+      --font-primary: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "IBM Plex Mono", "Fira Code", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 30%, rgba(76, 29, 149, 0.22), transparent 60%),
+        radial-gradient(ellipse 70% 50% at 50% 70%, rgba(30, 27, 75, 0.30), transparent 65%),
+        radial-gradient(ellipse 100% 80% at 50% 50%, rgba(15, 23, 42, 0.50), transparent 75%),
+        linear-gradient(180deg, #05050d 0%, #08081a 50%, #050510 100%);
+      background-attachment: fixed;
+      color: var(--text);
+      font-family: var(--font-primary);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .puls-thread {
+      --thread-stroke: 1.5px;
+      --thread-blur: 32px;
+      --thread-opacity: 0.55;
+      --thread-cyan-opacity: 0.08;
+      --thread-gold-opacity: 0.08;
+      --thread-rate: 6s;
+      --thread-aura-scale: 1;
+      --thread-event-progress: 1;
+      min-height: 100vh;
+      min-height: 100svh;
+      position: relative;
+      isolation: isolate;
+      transition:
+        --thread-stroke .4s ease,
+        --thread-blur .4s ease,
+        --thread-opacity .4s ease,
+        --thread-cyan-opacity .4s ease,
+        --thread-gold-opacity .4s ease;
+    }
+
+    .puls-thread[data-state="zazeh"] {
+      --thread-stroke: 2px;
+      --thread-blur: 64px;
+      --thread-opacity: 0.9;
+      --thread-cyan-opacity: 0.35;
+      --thread-gold-opacity: 0.10;
+      --thread-rate: 2.4s;
+    }
+
+    .puls-thread[data-state="klid"] {
+      --thread-stroke: 1.5px;
+      --thread-blur: 32px;
+      --thread-opacity: 0.55;
+      --thread-cyan-opacity: 0.08;
+      --thread-gold-opacity: 0.08;
+      --thread-rate: 6s;
+    }
+
+    .puls-thread[data-state="zhusteni"] {
+      --thread-stroke: 2.5px;
+      --thread-blur: 56px;
+      --thread-opacity: 0.78;
+      --thread-cyan-opacity: 0.18;
+      --thread-gold-opacity: 0.10;
+      --thread-rate: 4s;
+    }
+
+    .puls-thread[data-state="flare"] {
+      --thread-stroke: 3.5px;
+      --thread-blur: 96px;
+      --thread-opacity: 0.92;
+      --thread-cyan-opacity: 0.32;
+      --thread-gold-opacity: 0.12;
+      --thread-rate: 2.5s;
+    }
+
+    .puls-thread[data-state="ping-flash"] {
+      --thread-stroke: 3.5px;
+      --thread-blur: 136px;
+      --thread-opacity: 1;
+      --thread-cyan-opacity: 0.52;
+      --thread-gold-opacity: 0.12;
+      --thread-rate: 450ms;
+    }
+
+    .puls-thread[data-state="utulek"] {
+      --thread-stroke: 1.5px;
+      --thread-blur: 180px;
+      --thread-opacity: 0.65;
+      --thread-cyan-opacity: 0.05;
+      --thread-gold-opacity: 0.30;
+      --thread-rate: 4.6s;
+    }
+
+    .puls-thread[data-state="doutnak"] {
+      --thread-stroke: 1px;
+      --thread-blur: 24px;
+      --thread-opacity: 0.28;
+      --thread-cyan-opacity: 0;
+      --thread-gold-opacity: 0.06;
+      --thread-rate: 8s;
+    }
+
+    .puls-thread.is-reduced,
+    .puls-thread.is-reduced * {
+      animation: none !important;
+      transition-duration: 0s !important;
+    }
+
+    .puls-thread.is-reduced {
+      --thread-blur: 32px;
+    }
+
+    .toolbar {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 20;
+      width: min(calc(100% - 32px), 1080px);
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(8, 8, 26, 0.74);
+      box-shadow: 0 18px 60px rgba(0, 0, 0, 0.38);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .state-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .state-button,
+    .motion-toggle {
+      min-height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface-1);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+    }
+
+    .state-button {
+      padding: 0 12px;
+    }
+
+    .motion-toggle {
+      flex-shrink: 0;
+      padding: 0 14px;
+      white-space: nowrap;
+    }
+
+    .state-button:hover,
+    .motion-toggle:hover,
+    .state-button:focus-visible,
+    .motion-toggle:focus-visible {
+      border-color: var(--border-strong);
+      background: var(--surface-2);
+      color: var(--text);
+      outline: none;
+    }
+
+    .state-button.is-active,
+    .motion-toggle.is-active {
+      border-color: rgba(141, 42, 243, 0.46);
+      background: rgba(141, 42, 243, 0.16);
+      color: var(--text);
+      box-shadow: 0 0 28px rgba(141, 42, 243, 0.18);
+    }
+
+    .thread-root {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .thread-svg {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: min(520px, 58vw);
+      height: 100%;
+      transform: translateX(-50%);
+      overflow: visible;
+      filter:
+        drop-shadow(0 0 calc(var(--thread-blur) * 0.28) rgba(141, 42, 243, 0.18))
+        drop-shadow(0 0 var(--thread-blur) rgba(141, 42, 243, 0.10));
+      animation: auraBreath var(--thread-rate) ease-in-out infinite;
+      transition: filter .4s ease;
+    }
+
+    .thread-layer,
+    .thread-fiber,
+    .thread-gold {
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .thread-fiber {
+      stroke-width: var(--thread-stroke);
+      opacity: var(--thread-opacity);
+      filter: url(#fiber-glow);
+      mix-blend-mode: screen;
+      animation: fiberWeave 6s ease-in-out infinite alternate;
+      transition: opacity .4s ease, stroke-width .4s ease;
+    }
+
+    .thread-fiber.is-violet {
+      stroke: var(--thread-violet);
+    }
+
+    .thread-fiber.is-cyan {
+      stroke: var(--thread-cyan);
+      opacity: calc(var(--thread-opacity) * 0.82);
+    }
+
+    .thread-gold {
+      stroke: var(--thread-gold);
+      stroke-width: 42px;
+      opacity: var(--thread-gold-opacity);
+      filter: url(#gold-halo);
+      mix-blend-mode: screen;
+      transition: opacity .4s ease;
+    }
+
+    .puls-thread[data-state="doutnak"] .thread-fiber {
+      stroke-dasharray: 10 20;
+    }
+
+    .puls-thread[data-state="zazeh"] .thread-svg {
+      animation: zazehExpand 2.4s cubic-bezier(.4,0,.2,1), auraBreath var(--thread-rate) ease-in-out infinite 2.4s;
+    }
+
+    .puls-thread[data-state="zazeh"] .thread-gold {
+      animation: zazehGold 2.4s cubic-bezier(.4,0,.2,1);
+    }
+
+    .puls-thread[data-state="ping-flash"] .thread-svg {
+      animation: pingFlash 450ms cubic-bezier(.16,1,.3,1), auraBreath 2.5s ease-in-out infinite 450ms;
+    }
+
+    @keyframes fiberWeave {
+      0% {
+        stroke-dashoffset: 0;
+        transform: translateX(-2px) scaleX(0.985);
+      }
+      50% {
+        transform: translateX(3px) scaleX(1.025);
+      }
+      100% {
+        stroke-dashoffset: -120;
+        transform: translateX(1px) scaleX(1.01);
+      }
+    }
+
+    @keyframes auraBreath {
+      0%, 100% {
+        filter:
+          drop-shadow(0 0 calc(var(--thread-blur) * 0.22) rgba(141, 42, 243, 0.14))
+          drop-shadow(0 0 var(--thread-blur) rgba(141, 42, 243, 0.09));
+      }
+      50% {
+        filter:
+          drop-shadow(0 0 calc(var(--thread-blur) * 0.36) rgba(141, 42, 243, 0.22))
+          drop-shadow(0 0 calc(var(--thread-blur) * 1.4) rgba(141, 42, 243, 0.13));
+      }
+    }
+
+    @keyframes zazehExpand {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) scaleY(0.04);
+        filter: drop-shadow(0 0 0 rgba(245, 166, 35, 0));
+      }
+      42% {
+        opacity: 1;
+        transform: translateX(-50%) scaleY(0.62);
+        filter: drop-shadow(0 0 64px rgba(245, 166, 35, 0.40));
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(-50%) scaleY(1);
+      }
+    }
+
+    @keyframes zazehGold {
+      0% {
+        opacity: 0;
+      }
+      42% {
+        opacity: 0.40;
+      }
+      100% {
+        opacity: 0.10;
+      }
+    }
+
+    @keyframes pingFlash {
+      0%, 100% {
+        transform: translateX(-50%) scaleX(1);
+      }
+      40% {
+        transform: translateX(-50%) scaleX(1.12);
+      }
+    }
+
+    .stage {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 112px 24px 56px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .state-readout {
+      width: min(100%, 440px);
+      margin-left: min(28vw, 380px);
+      padding: 24px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.035);
+      color: var(--text-muted);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .state-readout .eyebrow {
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .state-readout h1 {
+      margin: 10px 0;
+      color: var(--text);
+      font-size: clamp(1.8rem, 2.4rem, 3rem);
+      line-height: 1.1;
+    }
+
+    .state-readout p {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition-duration: 0s !important;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body {
+        overflow: auto;
+      }
+
+      .toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .state-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .state-button,
+      .motion-toggle {
+        width: 100%;
+      }
+
+      .thread-svg {
+        width: min(300px, 64vw);
+      }
+
+      .state-readout {
+        margin: 40vh auto 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="puls-thread" id="threadLab" data-state="klid">
+    <header class="toolbar" aria-label="Ovládání stavů nitě">
+      <div class="state-buttons" role="group" aria-label="Stavy nitě">
+        <button class="state-button" type="button" data-state-target="zazeh">Zážeh</button>
+        <button class="state-button is-active" type="button" data-state-target="klid">Klid</button>
+        <button class="state-button" type="button" data-state-target="zhusteni">Zhuštění</button>
+        <button class="state-button" type="button" data-state-target="flare">Flare</button>
+        <button class="state-button" type="button" data-state-target="ping-flash">Ping flash</button>
+        <button class="state-button" type="button" data-state-target="utulek">Útulek</button>
+        <button class="state-button" type="button" data-state-target="doutnak">Doutnák</button>
+      </div>
+      <button class="motion-toggle" type="button" id="motionToggle" aria-pressed="false">Reduced motion: off</button>
+    </header>
+
+    <div class="thread-root" aria-hidden="true">
+      <svg class="thread-svg" viewBox="0 0 520 960" preserveAspectRatio="none">
+        <defs>
+          <filter id="fiber-glow" x="-180%" y="-20%" width="460%" height="140%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="fiberBlur"></feGaussianBlur>
+            <feMerge>
+              <feMergeNode in="fiberBlur"></feMergeNode>
+              <feMergeNode in="SourceGraphic"></feMergeNode>
+            </feMerge>
+          </filter>
+          <filter id="gold-halo" x="-260%" y="-30%" width="620%" height="160%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="64" result="goldBlur"></feGaussianBlur>
+            <feMerge>
+              <feMergeNode in="goldBlur"></feMergeNode>
+            </feMerge>
+          </filter>
+        </defs>
+        <path id="goldPath" class="thread-gold" d=""></path>
+        <g id="fiberLayer" class="thread-layer"></g>
+      </svg>
+    </div>
+
+    <main class="stage">
+      <section class="state-readout" aria-live="polite">
+        <div class="eyebrow">Thread state v2</div>
+        <h1 id="stateTitle">Klid</h1>
+        <p id="stateDescription">12 propletených vláken, hustší střed, jemná violet aura, cyan jen jako mikro-vlákna.</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const lab = document.getElementById("threadLab");
+    const fiberLayer = document.getElementById("fiberLayer");
+    const goldPath = document.getElementById("goldPath");
+    const stateTitle = document.getElementById("stateTitle");
+    const stateDescription = document.getElementById("stateDescription");
+    const motionToggle = document.getElementById("motionToggle");
+    const buttons = Array.from(document.querySelectorAll("[data-state-target]"));
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
+    const stateConfig = {
+      zazeh: {
+        title: "Zážeh",
+        type: "Event 2.4s",
+        density: 14,
+        stroke: 2,
+        blur: 64,
+        violet: 0.9,
+        cyan: 0.35,
+        gold: 0.10,
+        amplitude: [4, 14],
+        rate: "2.4s",
+        description: "Event sekvence: vlákna rampují z nuly do klidové nitě, se zlatým peakem a cyan mikro-záblesky."
+      },
+      klid: {
+        title: "Klid",
+        type: "Persistent",
+        density: 12,
+        stroke: 1.5,
+        blur: 32,
+        violet: 0.55,
+        cyan: 0.08,
+        gold: 0.08,
+        amplitude: [2, 8],
+        rate: "6s",
+        description: "12 propletených vláken, hustší střed, jemná violet aura, cyan jen jako mikro-vlákna."
+      },
+      zhusteni: {
+        title: "Zhuštění",
+        type: "Persistent",
+        density: 14,
+        stroke: 2.5,
+        blur: 56,
+        violet: 0.78,
+        cyan: 0.18,
+        gold: 0.10,
+        amplitude: [5, 13],
+        rate: "4s",
+        description: "14 vláken se stáhne blíž ke středu, aura zesílí a rytmus zrychlí před selektorem."
+      },
+      flare: {
+        title: "Flare",
+        type: "Persistent",
+        density: 16,
+        stroke: 3.5,
+        blur: 96,
+        violet: 0.92,
+        cyan: 0.32,
+        gold: 0.12,
+        amplitude: [12, 20],
+        rate: "2.5s",
+        description: "16 vláken, výrazná aura a strukturální cyan mikro-vlákna. Vrchol pozornosti bez plošné cyan vrstvy."
+      },
+      "ping-flash": {
+        title: "Ping flash",
+        type: "Event 450ms",
+        density: 16,
+        stroke: 3.5,
+        blur: 136,
+        violet: 1,
+        cyan: 0.52,
+        gold: 0.12,
+        amplitude: [12, 20],
+        rate: "450ms",
+        description: "Krátký spike nad aktuální flare architekturou: více bluru, víc opacity a krátké roztažení svazku."
+      },
+      utulek: {
+        title: "Útulek",
+        type: "Persistent",
+        density: 10,
+        stroke: 1.5,
+        blur: 180,
+        violet: 0.65,
+        cyan: 0.05,
+        gold: 0.30,
+        amplitude: [10, 22],
+        rate: "4.6s",
+        spread: 1.55,
+        description: "10 rozevřených vláken, velmi široké pole a nejviditelnější zlatý outer halo. Pomalý dech."
+      },
+      doutnak: {
+        title: "Doutnák",
+        type: "Persistent",
+        density: 6,
+        stroke: 1,
+        blur: 24,
+        violet: 0.28,
+        cyan: 0,
+        gold: 0.06,
+        amplitude: [4, 12],
+        rate: "8s",
+        spread: 1.35,
+        description: "6 řídnoucích vláken, bez cyan záblesků. Svazek se rozpadá a zhasíná."
+      }
+    };
+
+    function seededRandom(seed) {
+      let value = seed % 2147483647;
+      return () => {
+        value = value * 16807 % 2147483647;
+        return (value - 1) / 2147483646;
+      };
+    }
+
+    function randomBetween(random, min, max) {
+      return min + (max - min) * random();
+    }
+
+    function weightedSign(random) {
+      return random() < 0.5 ? -1 : 1;
+    }
+
+    function buildFiberPath({ xBase, phase, amplitude, speed, secondaryAmp }) {
+      const points = [];
+      const height = 1040;
+      const step = 52;
+      for (let y = -40; y <= height; y += step) {
+        const t = y / height;
+        const waveA = Math.sin(t * Math.PI * 4.4 * speed + phase) * amplitude;
+        const waveB = Math.sin(t * Math.PI * 9.2 + phase * 0.62) * secondaryAmp;
+        const x = 260 + xBase + waveA + waveB;
+        points.push([x, y]);
+      }
+
+      let d = `M ${points[0][0].toFixed(2)} ${points[0][1].toFixed(2)}`;
+      for (let i = 1; i < points.length - 1; i++) {
+        const current = points[i];
+        const next = points[i + 1];
+        const cx = current[0].toFixed(2);
+        const cy = current[1].toFixed(2);
+        const mx = ((current[0] + next[0]) / 2).toFixed(2);
+        const my = ((current[1] + next[1]) / 2).toFixed(2);
+        d += ` Q ${cx} ${cy} ${mx} ${my}`;
+      }
+      return d;
+    }
+
+    function applyStateVars(config) {
+      lab.style.setProperty("--thread-stroke", `${config.stroke}px`);
+      lab.style.setProperty("--thread-blur", `${config.blur}px`);
+      lab.style.setProperty("--thread-opacity", config.violet);
+      lab.style.setProperty("--thread-cyan-opacity", config.cyan);
+      lab.style.setProperty("--thread-gold-opacity", config.gold);
+      lab.style.setProperty("--thread-rate", config.rate);
+    }
+
+    function rateToSeconds(rate) {
+      if (rate.endsWith("ms")) return parseFloat(rate) / 1000;
+      return parseFloat(rate);
+    }
+
+    function renderFibers(state) {
+      const config = stateConfig[state];
+      const density = config.density;
+      const random = seededRandom([...state].reduce((sum, char) => sum + char.charCodeAt(0), density * 97));
+      const spread = config.spread || 1;
+      const paths = [];
+
+      fiberLayer.replaceChildren();
+      applyStateVars(config);
+
+      for (let i = 0; i < density; i++) {
+        const centerBias = Math.abs(i - (density - 1) / 2) / ((density - 1) / 2 || 1);
+        const xOffset = Math.pow(centerBias, 2) * 40 * spread * weightedSign(random);
+        const phase = randomBetween(random, 0, Math.PI * 2);
+        const speed = randomBetween(random, 0.8, 1.4);
+        const amplitude = randomBetween(random, config.amplitude[0], config.amplitude[1]);
+        const secondaryAmp = randomBetween(random, 1.5, 5);
+        const d = buildFiberPath({ xBase: xOffset, phase, amplitude, speed, secondaryAmp });
+        const path = document.createElementNS(SVG_NS, "path");
+        const isCyan = random() < config.cyan;
+
+        path.setAttribute("d", d);
+        path.setAttribute("class", `thread-fiber ${isCyan ? "is-cyan" : "is-violet"}`);
+        path.style.opacity = String(config.violet * randomBetween(random, 0.58, 1));
+        path.style.strokeWidth = `${config.stroke * randomBetween(random, 0.32, 0.72)}px`;
+        const duration = Math.max(0.9, rateToSeconds(config.rate) * randomBetween(random, 0.8, 1.4));
+        path.style.animationDelay = `${-randomBetween(random, 0, duration).toFixed(2)}s`;
+        path.style.animationDuration = `${duration.toFixed(2)}s`;
+        fiberLayer.appendChild(path);
+        paths.push(d);
+      }
+
+      goldPath.setAttribute("d", buildFiberPath({
+        xBase: 0,
+        phase: 0.8,
+        amplitude: state === "utulek" ? 18 : 8,
+        speed: 1,
+        secondaryAmp: 2
+      }));
+
+      stateTitle.textContent = config.title;
+      stateDescription.textContent = `${config.type}. ${config.description}`;
+
+      buttons.forEach((button) => {
+        const isActive = button.dataset.stateTarget === state;
+        button.classList.toggle("is-active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+    }
+
+    function setState(state) {
+      if (!stateConfig[state]) return;
+      lab.dataset.state = state;
+      renderFibers(state);
+
+      if (state === "zazeh") {
+        window.setTimeout(() => {
+          if (lab.dataset.state === "zazeh") setState("klid");
+        }, 2400);
+      }
+
+      if (state === "ping-flash") {
+        window.setTimeout(() => {
+          if (lab.dataset.state === "ping-flash") setState("flare");
+        }, 450);
+      }
+    }
+
+    buttons.forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.classList.contains("is-active")));
+      button.addEventListener("click", () => setState(button.dataset.stateTarget));
+    });
+
+    motionToggle.addEventListener("click", () => {
+      const isReduced = lab.classList.toggle("is-reduced");
+      motionToggle.classList.toggle("is-active", isReduced);
+      motionToggle.setAttribute("aria-pressed", String(isReduced));
+      motionToggle.textContent = `Reduced motion: ${isReduced ? "on" : "off"}`;
+    });
+
+    renderFibers("klid");
+  </script>
+</body>
+</html>
