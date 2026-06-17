@@ -22,7 +22,25 @@
 </head>
 <body>
   <a href="#headline" class="skip-link" style="position:absolute;left:-9999px;top:0;background:#8D2AF3;color:#fff;padding:.5rem 1rem;z-index:9999;">Přeskočit na obsah</a>
-  <div id="puls-thread" class="puls-thread-v0" aria-hidden="true"></div>
+  <div id="puls-thread" class="puls-thread-v0" aria-hidden="true">
+    <svg class="thread-svg" viewBox="0 0 520 960" preserveAspectRatio="none">
+      <defs>
+        <filter id="fiber-glow" x="-120%" y="-20%" width="340%" height="140%">
+          <feGaussianBlur stdDeviation="2.8" result="soft"></feGaussianBlur>
+          <feColorMatrix in="soft" type="matrix" values="1 0 0 0 0.55  0 1 0 0 0.16  0 0 1 0 0.95  0 0 0 0.65 0"></feColorMatrix>
+          <feMerge>
+            <feMergeNode></feMergeNode>
+            <feMergeNode in="SourceGraphic"></feMergeNode>
+          </feMerge>
+        </filter>
+        <filter id="gold-halo" x="-180%" y="-20%" width="460%" height="140%">
+          <feGaussianBlur stdDeviation="34"></feGaussianBlur>
+        </filter>
+      </defs>
+      <path id="threadGoldPath" class="thread-gold" d=""></path>
+      <g id="threadFiberLayer" class="thread-layer"></g>
+    </svg>
+  </div>
   <noscript>
     <div style="padding:1rem 2rem;background:#0d1220;color:rgba(255,255,255,0.9);text-align:center;border-bottom:1px solid rgba(255,255,255,0.08);">
       PULS funguje plně s&nbsp;vypnutým JavaScriptem — interaktivní výběr úrovně vyžaduje JS. <a href="mailto:tereza.svanda@praut.cz" style="color:#8D2AF3;">Napiš nám</a> a&nbsp;poradíme ti přímo.
@@ -99,21 +117,33 @@
         </div>
 
         <div class="tier-list" aria-label="Úrovně PULS">
-          <div class="tier-band" data-tier="foundation" role="button" tabindex="0" aria-pressed="false" aria-label="Vybrat úroveň Foundation">
+          <div class="tier-band" data-tier="foundation" role="button" tabindex="0" aria-pressed="false" aria-expanded="false" aria-label="Vybrat úroveň Foundation">
             <h3 class="tier-name">Foundation</h3>
             <p class="tier-desc">Zatím bez systému. Claude neznám, nebo ho otevírám namátkou a&nbsp;nevím, jak přesně ho zadat.</p>
+            <svg class="tier-chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
           </div>
-          <div class="tier-band" data-tier="power" role="button" tabindex="0" aria-pressed="false" aria-label="Vybrat úroveň Power">
+          <div class="tier-band" data-tier="power" role="button" tabindex="0" aria-pressed="false" aria-expanded="false" aria-label="Vybrat úroveň Power">
             <h3 class="tier-name">Power</h3>
             <p class="tier-desc">Chaotické workflow. Claude používám, ale výsledky kolísají. Chybí mi proces a&nbsp;opakovatelnost.</p>
+            <svg class="tier-chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
           </div>
-          <div class="tier-band" data-tier="advanced" role="button" tabindex="0" aria-pressed="false" aria-label="Vybrat úroveň Advanced">
+          <div class="tier-band" data-tier="advanced" role="button" tabindex="0" aria-pressed="false" aria-expanded="false" aria-label="Vybrat úroveň Advanced">
             <h3 class="tier-name">Advanced</h3>
             <p class="tier-desc">Mám strukturu. Umím používat pokročilé prompty a&nbsp;chci začít stavět vlastní nástroje a&nbsp;automatizovat.</p>
+            <svg class="tier-chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
           </div>
-          <div class="tier-band" data-tier="expert" role="button" tabindex="0" aria-pressed="false" aria-label="Vybrat úroveň Expert">
+          <div class="tier-band" data-tier="expert" role="button" tabindex="0" aria-pressed="false" aria-expanded="false" aria-label="Vybrat úroveň Expert">
             <h3 class="tier-name">Expert</h3>
             <p class="tier-desc">Mířím do produkce. Hledám profesionální řešení, vlastní servery a&nbsp;chci stavět produkty pro ostatní.</p>
+            <svg class="tier-chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6 9 6 6 6-6"></path>
+            </svg>
           </div>
         </div>
 

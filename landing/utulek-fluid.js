@@ -853,16 +853,11 @@
     }, 1500);
   }
 
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) activate();
-      else deactivate();
-    });
-  }, {
-    root: null,
-    threshold: 0.28,
-    rootMargin: "20% 0px 20% 0px"
-  });
-
-  observer.observe(section);
+  window.pulsUtulek = {
+    activate,
+    deactivate,
+    get isActive() {
+      return active;
+    }
+  };
 })();
