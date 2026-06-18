@@ -26,7 +26,7 @@
   <div id="puls-thread" class="puls-thread-v0" aria-hidden="true">
     <svg class="thread-svg" viewBox="0 0 520 960" preserveAspectRatio="none">
       <defs>
-        <filter id="fiber-glow" x="-120%" y="-20%" width="340%" height="140%">
+        <filter id="fiber-glow" x="-120%" y="-20%" width="340%" height="140%" color-interpolation-filters="sRGB">
           <feGaussianBlur stdDeviation="2.8" result="soft"></feGaussianBlur>
           <feColorMatrix in="soft" type="matrix" values="1 0 0 0 0.55  0 1 0 0 0.16  0 0 1 0 0.95  0 0 0 0.65 0"></feColorMatrix>
           <feMerge>
@@ -34,7 +34,7 @@
             <feMergeNode in="SourceGraphic"></feMergeNode>
           </feMerge>
         </filter>
-        <filter id="gold-halo" x="-180%" y="-20%" width="460%" height="140%">
+        <filter id="gold-halo" x="-180%" y="-20%" width="460%" height="140%" color-interpolation-filters="sRGB">
           <feGaussianBlur stdDeviation="34"></feGaussianBlur>
         </filter>
       </defs>

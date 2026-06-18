@@ -71,6 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     && !/CriOS|FxiOS|EdgiOS/i.test(navigator.userAgent);
   const threadLiteQuery = window.matchMedia("(max-width: 760px)");
   let threadLiteMode = isSafari || threadLiteQuery.matches || reduceLogoMotion;
+  let threadStaticFallback = isSafari && !threadLiteQuery.matches;
   const compactLogoMotion = window.matchMedia("(max-width: 760px)").matches;
   const SVG_NS = "http://www.w3.org/2000/svg";
   const logoStates = new Set(["klid", "probuzeni", "puls", "thread", "nav"]);
@@ -191,8 +192,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function syncThreadLiteMode() {
     threadLiteMode = isSafari || threadLiteQuery.matches || reduceLogoMotion;
+    threadStaticFallback = isSafari && !threadLiteQuery.matches;
     document.documentElement.classList.toggle("thread-lite", threadLiteMode);
     document.documentElement.classList.toggle("is-safari", isSafari);
+    document.documentElement.classList.toggle("thread-static-fallback", threadStaticFallback);
   }
 
   if (thread && reduceLogoMotion) thread.classList.add("is-reduced");
@@ -605,9 +608,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function applySectionThreadState(state) {
     if (!state) return;
-    syncUtulekState(state === "utulek");
+    const resolvedState = threadLiteQuery.matches && state !== "utulek" ? "klid" : state;
+    syncUtulekState(resolvedState === "utulek");
     if (currentThreadState === "zazeh" || currentThreadState === "ping-flash") return;
-    if (state !== currentThreadState) setThreadState(state);
+    if (resolvedState !== currentThreadState) setThreadState(resolvedState);
   }
 
   function getActiveSectionId() {
@@ -679,7 +683,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     setState: setThreadState,
     triggerPing() {
-      if (reduceLogoMotion) return;
+      if (reduceLogoMotion || threadLiteQuery.matches) return;
       setThreadState("ping-flash", { remember: false });
     }
   };
