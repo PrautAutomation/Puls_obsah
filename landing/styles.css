@@ -392,20 +392,27 @@ body[data-logo-state="nav"] .thread-svg {
 }
 
 .thread-static-fallback #puls-thread::after {
-  width: 156px;
+  width: 210px;
   opacity: calc(var(--thread-gold-opacity) + 0.04);
   background:
-    radial-gradient(ellipse 18px 44% at 48% 50%, rgba(245, 166, 35, 0.20), transparent 68%),
-    radial-gradient(ellipse 12px 38% at 55% 58%, rgba(34, 211, 238, 0.10), transparent 70%),
+    radial-gradient(ellipse 3px 54% at 38% 50%, rgba(141, 42, 243, 0.22), transparent 72%),
+    radial-gradient(ellipse 5px 58% at 45% 48%, rgba(245, 166, 35, 0.26), transparent 70%),
+    radial-gradient(ellipse 2px 44% at 50% 53%, rgba(34, 211, 238, 0.16), transparent 72%),
+    radial-gradient(ellipse 4px 62% at 54% 50%, rgba(245, 166, 35, 0.22), transparent 72%),
+    radial-gradient(ellipse 3px 48% at 61% 56%, rgba(141, 42, 243, 0.20), transparent 74%),
+    radial-gradient(ellipse 2px 36% at 66% 45%, rgba(34, 211, 238, 0.10), transparent 76%),
+    radial-gradient(ellipse 26px 46% at 50% 52%, rgba(245, 166, 35, 0.12), transparent 72%),
     linear-gradient(
       92deg,
-      transparent 0 36%,
-      rgba(141, 42, 243, 0.14) 39%,
-      transparent 42% 48%,
-      rgba(245, 166, 35, 0.18) 51%,
-      transparent 55% 60%,
-      rgba(141, 42, 243, 0.12) 63%,
-      transparent 68% 100%
+      transparent 0 32%,
+      rgba(141, 42, 243, 0.10) 34%,
+      transparent 36% 42%,
+      rgba(245, 166, 35, 0.14) 44%,
+      transparent 46% 52%,
+      rgba(245, 166, 35, 0.12) 54%,
+      transparent 56% 62%,
+      rgba(141, 42, 243, 0.10) 64%,
+      transparent 67% 100%
     ),
     linear-gradient(
       to bottom,
@@ -415,7 +422,7 @@ body[data-logo-state="nav"] .thread-svg {
       rgba(245, 166, 35, 0.10) 78%,
       transparent 100%
     );
-  background-size: 100% 100%, 100% 100%, 76px 100%, 100% 100%;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 86px 100%, 100% 100%;
   box-shadow:
     0 0 42px rgba(245, 166, 35, 0.14),
     0 0 80px rgba(141, 42, 243, 0.10);
