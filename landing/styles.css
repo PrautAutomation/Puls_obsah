@@ -59,6 +59,16 @@ a {
   outline: 2px solid #fff;
 }
 
+#page-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 86% at 50% 50%, transparent 0 56%, rgba(9, 13, 28, 0.045) 78%, rgba(8, 10, 24, 0.09) 100%),
+    linear-gradient(90deg, rgba(20, 11, 38, 0.10), transparent 15% 85%, rgba(8, 20, 35, 0.09));
+}
+
 p {
   max-width: 60ch;
   margin: 0;
@@ -1838,6 +1848,12 @@ blockquote p + p {
 }
 
 @media (max-width: 760px) {
+  #page-vignette {
+    background:
+      radial-gradient(ellipse 82% 88% at 50% 50%, transparent 0 62%, rgba(9, 13, 28, 0.035) 82%, rgba(8, 10, 24, 0.065) 100%),
+      linear-gradient(90deg, rgba(20, 11, 38, 0.06), transparent 12% 88%, rgba(8, 20, 35, 0.055));
+  }
+
   .hero-moment {
     position: relative;
     top: auto;

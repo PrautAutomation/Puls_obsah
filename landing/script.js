@@ -76,18 +76,18 @@ document.addEventListener("DOMContentLoaded", () => {
     headline: "klid",
     problem: "klid",
     "breath-1": "klid",
-    reseni: "zhusteni",
+    reseni: "klid",
     prechod: "flare",
     "breath-2": "flare",
     selektor: "flare",
-    certifikat: "zhusteni",
+    certifikat: "klid",
     planner: "klid",
-    nemluvis: "zhusteni",
+    nemluvis: "klid",
     "tereza-quote": "utulek",
     "breath-3": "klid",
     garance: "klid",
     sef: "klid",
-    finale: "doutnak",
+    finale: "klid",
     footer: "doutnak"
   };
   const threadStateConfig = {
@@ -594,7 +594,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function getActiveSectionId() {
     if (!observedStateSections.length) return null;
-    const anchorY = window.innerHeight * 0.68;
+    const anchorY = window.innerHeight * 0.5;
     const candidates = observedStateSections
       .map((section) => {
         const rect = section.getBoundingClientRect();
