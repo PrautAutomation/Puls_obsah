@@ -246,7 +246,7 @@ body[data-logo-state="nav"] #puls-thread {
     drop-shadow(0 0 calc(var(--thread-blur) * 0.28) rgba(141, 42, 243, 0.18))
     drop-shadow(0 0 var(--thread-blur) rgba(141, 42, 243, 0.10));
   animation: threadAuraBreath var(--thread-rate) ease-in-out infinite;
-  transition: filter 1040ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 1040ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 body[data-logo-state="puls"] .thread-svg,
@@ -548,14 +548,10 @@ body[data-logo-state="nav"] .thread-svg {
 
 @keyframes threadAuraBreath {
   0%, 100% {
-    filter:
-      drop-shadow(0 0 calc(var(--thread-blur) * 0.22) rgba(141, 42, 243, 0.14))
-      drop-shadow(0 0 var(--thread-blur) rgba(141, 42, 243, 0.09));
+    opacity: 0.88;
   }
   50% {
-    filter:
-      drop-shadow(0 0 calc(var(--thread-blur) * 0.36) rgba(141, 42, 243, 0.22))
-      drop-shadow(0 0 calc(var(--thread-blur) * 1.4) rgba(141, 42, 243, 0.13));
+    opacity: 1;
   }
 }
 
