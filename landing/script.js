@@ -50,9 +50,14 @@ const HERO_READY_DELAY = 120;
 const HERO_INTRO_DELAY = 1000;
 const HERO_LOCAL_THREAD_DELAY = 300;
 const HERO_ZAZEH_DURATION = 2400;
+const HERO_HANDOFF_DURATION = 1280;
+const LOGO_TRAVEL_DURATION = 3000;
 
 document.addEventListener("DOMContentLoaded", () => {
   const nav = document.getElementById("nav-fixed");
+  const mobileMenu = document.getElementById("mobile-menu");
+  const mobileMenuToggle = document.querySelector(".nav-menu-toggle");
+  const mobileMenuLinks = document.querySelectorAll(".mobile-menu a");
   const heroLogo = document.querySelector(".hero-logo img");
   const heroLogoSystem = document.querySelector(".hero-logo-system");
   const navLogo = document.querySelector(".nav-logo");
@@ -152,6 +157,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let globalThreadActivated = false;
   let globalThreadReleaseReady = false;
   let globalThreadActivationPending = false;
+  let logoReadyForNav = false;
+  let userScrollIntent = false;
+  let lastMenuFocus = null;
 
   if (thread && reduceLogoMotion) thread.classList.add("is-reduced");
 
@@ -198,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
       heroLogoSystem.classList.add("hero-thread-dissolving");
       window.setTimeout(() => {
         heroLogoSystem.classList.remove("hero-thread-emerging", "hero-thread-dissolving");
-      }, reduceLogoMotion ? 0 : 760);
+      }, reduceLogoMotion ? 0 : HERO_HANDOFF_DURATION);
     }
   }
 
@@ -218,6 +226,7 @@ document.addEventListener("DOMContentLoaded", () => {
           heroLogoSystem.classList.add("hero-thread-emerging");
         }
         globalThreadReleaseReady = true;
+        logoReadyForNav = true;
         revealIntroNav();
         if (window.scrollY > 8) activateGlobalThread("klid");
         return;
@@ -229,7 +238,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (heroLogoSystem) heroLogoSystem.classList.add("hero-thread-emerging");
         globalThreadReleaseReady = true;
         if (globalThreadActivationPending || window.scrollY > 8) {
-          window.setTimeout(() => activateGlobalThread("zazeh"), reduceLogoMotion ? 0 : 640);
+          window.setTimeout(() => activateGlobalThread("zazeh"), reduceLogoMotion ? 0 : 840);
         }
       }, HERO_LOCAL_THREAD_DELAY);
 
@@ -240,6 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setLogoState("thread");
         if (globalThreadActivated) setThreadState("klid");
         markZazehPlayed();
+        logoReadyForNav = true;
         revealIntroNav();
         if (window.scrollY > 8) activateGlobalThread("klid");
       }, HERO_ZAZEH_DURATION);
@@ -250,6 +260,9 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".landing-logo-traveler").forEach((traveler) => {
       traveler.remove();
     });
+    if (heroLogoSystem && currentLogoState !== "nav") {
+      heroLogoSystem.classList.remove("is-traveling");
+    }
   }
 
   function settleNavLogo() {
@@ -272,6 +285,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     clearLogoTravelers();
+    if (heroLogoSystem) heroLogoSystem.classList.add("is-traveling");
     nav.classList.add("is-transitioning");
     nav.classList.remove("is-settled");
 
@@ -286,25 +300,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const dx = end.left + end.width / 2 - (start.left + start.width / 2);
     const dy = end.top + end.height / 2 - (start.top + start.height / 2);
     const scale = end.width / start.width;
-    const travelDuration = 2200;
+    const travelDuration = LOGO_TRAVEL_DURATION;
 
-    navSettleTimer = window.setTimeout(settleNavLogo, travelDuration * 0.52);
+    navSettleTimer = window.setTimeout(settleNavLogo, travelDuration * 0.62);
 
     const motion = traveler.animate(
       [
-        { offset: 0, transform: "translate(0, 0) scale(1)", opacity: 1 },
+        { offset: 0, transform: "translate(0, 0) scale(1)", opacity: 0 },
+        { offset: 0.08, transform: "translate(0, 0) scale(1)", opacity: 1 },
         {
-          offset: 0.34,
+          offset: 0.38,
           transform: `translate(${dx * 0.28}px, ${dy * 0.28}px) scale(${Math.max(scale * 7.2, 0.58)})`,
           opacity: 0.92
         },
         {
-          offset: 0.68,
+          offset: 0.70,
           transform: `translate(${dx * 0.76}px, ${dy * 0.70}px) scale(${Math.max(scale * 3.2, 0.28)})`,
           opacity: 0.72
         },
         {
-          offset: 0.88,
+          offset: 0.90,
           transform: `translate(${dx * 0.97}px, ${dy * 0.90}px) scale(${Math.max(scale * 1.62, scale)})`,
           opacity: 0.44
         },
@@ -327,6 +342,9 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     motion.oncancel = () => {
       traveler.remove();
+      if (heroLogoSystem && currentLogoState !== "nav") {
+        heroLogoSystem.classList.remove("is-traveling");
+      }
     };
   }
 
@@ -503,7 +521,13 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   function updateNavVisibility() {
-    if (window.scrollY > 8) activateGlobalThread("klid");
+    const hasScrolled = userScrollIntent && window.scrollY > 8;
+    if (hasScrolled) activateGlobalThread("klid");
+
+    if (hasScrolled && logoReadyForNav && !navTransitionPlayed) {
+      navTransitionPlayed = true;
+      window.pulsLogo.animateToNav();
+    }
 
     const threshold = window.innerHeight * NAV_REVEAL_POINT;
     const scrolledPastNavPoint = window.scrollY > threshold;
@@ -512,12 +536,7 @@ document.addEventListener("DOMContentLoaded", () => {
     nav.classList.toggle("is-visible", isVisible);
 
     if (scrolledPastNavPoint && !hasScrolledPastNavPoint) {
-      if (!navTransitionPlayed) {
-        navTransitionPlayed = true;
-        animateHeroLogoToNav();
-      } else {
-        settleNavLogo();
-      }
+      settleNavLogo();
     }
 
     if (!isVisible) {
@@ -527,6 +546,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     hasScrolledPastNavPoint = scrolledPastNavPoint;
+  }
+
+  function setMobileMenuOpen(isOpen) {
+    if (!mobileMenu || !mobileMenuToggle) return;
+    if (isOpen) {
+      lastMenuFocus = document.activeElement;
+      mobileMenu.hidden = false;
+      document.body.classList.add("mobile-menu-open");
+      mobileMenuToggle.setAttribute("aria-expanded", "true");
+      mobileMenuToggle.setAttribute("aria-label", "Zavřít menu");
+      const firstLink = mobileMenu.querySelector("a");
+      if (firstLink) firstLink.focus({ preventScroll: true });
+      return;
+    }
+
+    document.body.classList.remove("mobile-menu-open");
+    mobileMenuToggle.setAttribute("aria-expanded", "false");
+    mobileMenuToggle.setAttribute("aria-label", "Otevřít menu");
+    window.setTimeout(() => {
+      if (!document.body.classList.contains("mobile-menu-open")) {
+        mobileMenu.hidden = true;
+      }
+    }, reduceLogoMotion ? 0 : 320);
+    if (lastMenuFocus && typeof lastMenuFocus.focus === "function") {
+      lastMenuFocus.focus({ preventScroll: true });
+    }
   }
 
   function createMailtoSubject(prefix, tierName) {
@@ -615,8 +660,33 @@ document.addEventListener("DOMContentLoaded", () => {
   setThreadState("klid");
   playHeroZazehSequence();
   updateNavVisibility();
+  function markUserScrollIntent() {
+    userScrollIntent = true;
+  }
+
+  window.addEventListener("wheel", markUserScrollIntent, { passive: true });
+  window.addEventListener("touchmove", markUserScrollIntent, { passive: true });
+  window.addEventListener("keydown", (event) => {
+    const scrollKeys = ["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "];
+    if (scrollKeys.includes(event.key)) markUserScrollIntent();
+  });
   window.addEventListener("scroll", updateNavVisibility, { passive: true });
   window.addEventListener("resize", updateNavVisibility);
+  if (mobileMenuToggle) {
+    mobileMenuToggle.addEventListener("click", () => {
+      setMobileMenuOpen(!document.body.classList.contains("mobile-menu-open"));
+    });
+  }
+
+  mobileMenuLinks.forEach((link) => {
+    link.addEventListener("click", () => setMobileMenuOpen(false));
+  });
+
+  window.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && document.body.classList.contains("mobile-menu-open")) {
+      setMobileMenuOpen(false);
+    }
+  });
 
   tierBands.forEach((band) => {
     band.setAttribute("aria-expanded", "false");

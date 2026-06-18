@@ -54,8 +54,52 @@
       </span>
       <span class="mono">PULS</span>
     </a>
-    <a class="nav-cta mono" href="#selektor">[ Zjisti, kde začít ]</a>
+    <div class="nav-pill" role="list" aria-label="Rychlá navigace">
+      <a class="nav-pill-item" href="#selektor" role="listitem">
+        <svg class="nav-pill-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"></circle>
+          <path d="m15.5 8.5-2.1 4.9-4.9 2.1 2.1-4.9 4.9-2.1Z"></path>
+        </svg>
+        <span>Kde začít</span>
+      </a>
+      <a class="nav-pill-item" href="/login" role="listitem" data-action="login">
+        <svg class="nav-pill-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+          <path d="m10 17 5-5-5-5"></path>
+          <path d="M15 12H3"></path>
+        </svg>
+        <span>Přihlásit</span>
+      </a>
+      <a class="nav-pill-item nav-pill-contact" href="mailto:tereza.svanda@praut.cz" role="listitem" aria-label="Kontaktovat PULS">
+        <svg class="nav-pill-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 4h16v16H4z"></path>
+          <path d="m4 7 8 6 8-6"></path>
+        </svg>
+        <span>Kontakt</span>
+      </a>
+    </div>
+    <button class="nav-menu-toggle" type="button" aria-label="Otevřít menu" aria-controls="mobile-menu" aria-expanded="false">
+      <svg class="nav-menu-chevron" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m6 9 6 6 6-6"></path>
+      </svg>
+    </button>
   </nav>
+  <div id="mobile-menu" class="mobile-menu" hidden>
+    <div class="mobile-menu-panel" role="dialog" aria-modal="true" aria-label="Menu PULS">
+      <a class="mobile-menu-item" href="#selektor">
+        <span>Kde začít</span>
+        <span class="mobile-menu-meta mono">výběr úrovně</span>
+      </a>
+      <a class="mobile-menu-item" href="/login" data-action="login">
+        <span>Přihlásit</span>
+        <span class="mobile-menu-meta mono">planner</span>
+      </a>
+      <a class="mobile-menu-item mobile-menu-contact" href="mailto:tereza.svanda@praut.cz">
+        <span>Kontakt</span>
+        <span class="mobile-menu-meta mono">tereza.svanda@praut.cz</span>
+      </a>
+    </div>
+  </div>
 
   <main>
     <section id="hero" class="moment hero-moment" aria-label="PULS">
