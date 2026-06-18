@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://praut.cz/sitemap.xml

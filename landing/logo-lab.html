@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PULS Logo Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070a12;
+      --bg-deep: #03050b;
+      --violet: #8D2AF3;
+      --cyan: #22D3EE;
+      --gold: #F5A623;
+      --text: #F4F6FA;
+      --muted: #A4ACBE;
+      --border: rgba(255,255,255,0.10);
+      --surface: rgba(255,255,255,0.045);
+      --font-primary: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "IBM Plex Mono", "Fira Code", monospace;
+    }
+
+    * { box-sizing: border-box; }
+
+    html,
+    body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(ellipse 78% 62% at 50% 34%, rgba(141, 42, 243, 0.30), transparent 62%),
+        radial-gradient(ellipse 52% 38% at 50% 52%, rgba(34, 211, 238, 0.085), transparent 68%),
+        radial-gradient(ellipse 46% 32% at 50% 66%, rgba(245, 166, 35, 0.09), transparent 70%),
+        radial-gradient(ellipse 100% 80% at 50% 50%, rgba(15, 23, 42, 0.56), transparent 76%),
+        linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 48%, #04060d 100%);
+      color: var(--text);
+      font-family: var(--font-primary);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: geometricPrecision;
+    }
+
+    button { font: inherit; }
+
+    .toolbar {
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      z-index: 20;
+      display: flex;
+      width: min(calc(100% - 32px), 680px);
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: rgba(7, 10, 18, 0.72);
+      box-shadow: 0 18px 60px rgba(0,0,0,0.36);
+      transform: translateX(-50%);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .toolbar button {
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+    }
+
+    .toolbar button:hover,
+    .toolbar button.is-active {
+      border-color: rgba(141, 42, 243, 0.48);
+      background: rgba(141, 42, 243, 0.16);
+      color: var(--text);
+    }
+
+    .nav-preview {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      z-index: 16;
+      display: flex;
+      min-height: 64px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: rgba(7, 10, 18, 0.64);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-100%);
+      transition: opacity 520ms ease, transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .nav-preview.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .nav-brand-preview {
+      display: inline-flex;
+      min-height: 40px;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+    }
+
+    .nav-logo-preview {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.055);
+      box-shadow: 0 0 24px rgba(141, 42, 243, 0.18);
+    }
+
+    .nav-logo-preview img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      opacity: 0;
+    }
+
+    .nav-preview.is-settled .nav-logo-preview img {
+      opacity: 1;
+      transition: opacity 260ms ease;
+    }
+
+    .nav-preview .nav-cta-preview {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+    }
+
+    .logo-traveler {
+      position: fixed;
+      z-index: 40;
+      pointer-events: none;
+      transform-origin: center center;
+      filter:
+        drop-shadow(0 0 34px rgba(141, 42, 243, 0.56))
+        drop-shadow(0 0 80px rgba(245, 166, 35, 0.20));
+      will-change: transform, opacity;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 112px 24px 64px;
+      isolation: isolate;
+    }
+
+    .logo-system {
+      --core-scale: 1;
+      --core-opacity: 0.82;
+      --aura-opacity: 0.42;
+      --aura-scale: 1;
+      --thread-opacity: 0;
+      --thread-height: 0px;
+      --thread-width: 1.5px;
+      --thread-blur: 22px;
+      --emitter-opacity: 0;
+      --emitter-scale: 0.7;
+      --halo-ring-opacity: 0;
+      --signal-label-opacity: 0;
+      position: relative;
+      display: grid;
+      width: min(76vw, 580px);
+      aspect-ratio: 1 / 1;
+      place-items: center;
+      transform: translateY(-2vh);
+    }
+
+    .logo-aura,
+    .logo-aura::before,
+    .logo-aura::after {
+      position: absolute;
+      inset: 10%;
+      border-radius: 50%;
+      pointer-events: none;
+      content: "";
+    }
+
+    .logo-aura {
+      z-index: 0;
+      opacity: var(--aura-opacity);
+      transform: scale(var(--aura-scale));
+      transition: opacity 700ms ease, transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+      background:
+        radial-gradient(circle at 50% 44%, rgba(141, 42, 243, 0.50), transparent 44%),
+        radial-gradient(circle at 50% 48%, rgba(34, 211, 238, 0.13), transparent 60%),
+        radial-gradient(circle at 50% 64%, rgba(245, 166, 35, 0.16), transparent 55%);
+      filter: blur(38px);
+    }
+
+    .logo-aura::before {
+      inset: 18%;
+      opacity: 0.9;
+      background: radial-gradient(circle, rgba(245, 166, 35, 0.23), rgba(255,255,255,0.07) 18%, transparent 64%);
+      filter: blur(30px);
+    }
+
+    .logo-aura::after {
+      inset: -8%;
+      opacity: 0.62;
+      background: conic-gradient(from 180deg, transparent, rgba(141, 42, 243, 0.24), transparent, rgba(34, 211, 238, 0.14), transparent, rgba(245, 166, 35, 0.10), transparent);
+      filter: blur(54px);
+    }
+
+    .logo-pulse-halo {
+      position: absolute;
+      inset: 19%;
+      z-index: 1;
+      border-radius: 50%;
+      opacity: var(--halo-ring-opacity);
+      pointer-events: none;
+      transition: opacity 650ms ease;
+    }
+
+    .logo-pulse-halo::before,
+    .logo-pulse-halo::after {
+      position: absolute;
+      border-radius: inherit;
+      content: "";
+      pointer-events: none;
+    }
+
+    .logo-pulse-halo::before {
+      inset: 0;
+      background:
+        radial-gradient(circle, rgba(255,255,255,0.22), rgba(245, 166, 35, 0.16) 18%, rgba(141, 42, 243, 0.20) 48%, transparent 72%);
+      filter: blur(14px);
+      opacity: 0;
+    }
+
+    .logo-pulse-halo::after {
+      inset: -14px;
+      border: 1px solid rgba(255,255,255,0.32);
+      opacity: 0;
+    }
+
+    .logo-core {
+      position: relative;
+      z-index: 4;
+      width: min(86%, 480px);
+      opacity: var(--core-opacity);
+      transform: scale(var(--core-scale));
+      transition: opacity 650ms ease, transform 900ms cubic-bezier(0.16, 1, 0.3, 1), filter 900ms ease;
+      filter:
+        drop-shadow(0 0 30px rgba(141, 42, 243, 0.42))
+        drop-shadow(0 0 76px rgba(141, 42, 243, 0.22))
+        drop-shadow(0 0 22px rgba(245, 166, 35, 0.10));
+    }
+
+    .logo-core img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .logo-emitter {
+      position: absolute;
+      top: calc(50% + 148px);
+      left: 50%;
+      z-index: 3;
+      width: 210px;
+      height: 86px;
+      opacity: var(--emitter-opacity);
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(var(--emitter-scale));
+      transition: opacity 700ms ease, transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+      background:
+        radial-gradient(ellipse 42% 24% at 50% 42%, rgba(255,255,255,0.82), rgba(245, 166, 35, 0.45) 20%, rgba(245, 166, 35, 0.16) 44%, transparent 74%),
+        radial-gradient(ellipse 72% 42% at 50% 55%, rgba(245, 166, 35, 0.24), rgba(141, 42, 243, 0.12) 54%, transparent 78%);
+      filter: blur(14px);
+      mix-blend-mode: screen;
+    }
+
+    .logo-emitter::before,
+    .logo-emitter::after {
+      position: absolute;
+      inset: 28% 8%;
+      border-radius: 50%;
+      content: "";
+      background: radial-gradient(ellipse at center, rgba(255,255,255,0.68), rgba(245, 166, 35, 0.28) 38%, transparent 72%);
+      filter: blur(10px);
+      opacity: 0.72;
+    }
+
+    .logo-emitter::after {
+      inset: 2% -18%;
+      background: radial-gradient(ellipse at center, rgba(245, 166, 35, 0.24), transparent 68%);
+      filter: blur(24px);
+      opacity: 0.55;
+    }
+
+    .thread-origin {
+      position: absolute;
+      top: calc(50% + 152px);
+      left: 50%;
+      z-index: 1;
+      width: var(--thread-width);
+      height: var(--thread-height);
+      opacity: var(--thread-opacity);
+      pointer-events: none;
+      transform: translateX(-50%);
+      transform-origin: top center;
+      transition: height 1000ms cubic-bezier(0.16, 1, 0.3, 1), opacity 700ms ease, width 700ms ease, filter 700ms ease;
+      background: linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.94) 0%,
+        rgba(245, 166, 35, 0.92) 12%,
+        rgba(245, 166, 35, 0.70) 35%,
+        rgba(141, 42, 243, 0.56) 68%,
+        transparent 100%
+      );
+      background-size: 100% 170%;
+      box-shadow:
+        0 0 var(--thread-blur) rgba(245, 166, 35, 0.60),
+        0 0 calc(var(--thread-blur) * 2.2) rgba(245, 166, 35, 0.26),
+        0 0 calc(var(--thread-blur) * 3.2) rgba(141, 42, 243, 0.20);
+    }
+
+    .thread-origin::before,
+    .thread-origin::after {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: 1px;
+      height: 100%;
+      content: "";
+      background: linear-gradient(to bottom, rgba(255,255,255,0.46), rgba(245, 166, 35, 0.34), rgba(141, 42, 243, 0.12), transparent);
+      opacity: 0.55;
+      transform: translateX(-50%) rotate(2.8deg);
+      filter: blur(0.4px);
+    }
+
+    .thread-origin::after {
+      background: linear-gradient(to bottom, rgba(245, 166, 35, 0.62), rgba(245, 166, 35, 0.20), rgba(141, 42, 243, 0.18), transparent);
+      transform: translateX(-50%) rotate(-3.5deg);
+    }
+
+    .signal-label {
+      position: absolute;
+      top: calc(50% + 184px);
+      left: calc(50% + 14px);
+      z-index: 5;
+      opacity: var(--signal-label-opacity);
+      color: rgba(255,255,255,0.88);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      letter-spacing: 0.16em;
+      pointer-events: none;
+      text-shadow:
+        0 0 18px rgba(245, 166, 35, 0.38),
+        0 0 34px rgba(141, 42, 243, 0.26);
+      transform: translateY(8px);
+      transition: opacity 700ms ease, transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .state-card {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 20;
+      width: min(calc(100% - 36px), 320px);
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: rgba(7, 10, 18, 0.72);
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.55;
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .state-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    [data-state="klid"] .logo-system {
+      --core-scale: 1;
+      --core-opacity: 0.82;
+      --aura-opacity: 0.38;
+      --aura-scale: 1;
+    }
+
+    [data-state="probuzeni"] .logo-system {
+      --core-scale: 1.035;
+      --core-opacity: 0.98;
+      --aura-opacity: 0.82;
+      --aura-scale: 1.18;
+      --emitter-opacity: 0.28;
+      --emitter-scale: 0.88;
+      --halo-ring-opacity: 0.58;
+    }
+
+    [data-state="puls"] .logo-system {
+      --core-scale: 1.065;
+      --core-opacity: 1;
+      --aura-opacity: 0.98;
+      --aura-scale: 1.34;
+      --emitter-opacity: 0.58;
+      --emitter-scale: 1.06;
+      --halo-ring-opacity: 0.82;
+    }
+
+    [data-state="thread"] .logo-system {
+      --core-scale: 1.04;
+      --core-opacity: 1;
+      --aura-opacity: 0.86;
+      --aura-scale: 1.26;
+      --emitter-opacity: 0.92;
+      --emitter-scale: 1.24;
+      --halo-ring-opacity: 0.66;
+      --signal-label-opacity: 1;
+      --thread-opacity: 1;
+      --thread-height: min(50vh, 430px);
+      --thread-width: 2.5px;
+      --thread-blur: 48px;
+    }
+
+    [data-state="nav"] .logo-system {
+      --core-scale: 0.82;
+      --core-opacity: 0;
+      --aura-opacity: 0;
+      --aura-scale: 0.88;
+      --emitter-opacity: 0;
+      --halo-ring-opacity: 0;
+      --signal-label-opacity: 0;
+      --thread-opacity: 0;
+      --thread-height: min(50vh, 430px);
+      --thread-width: 2px;
+      --thread-blur: 34px;
+    }
+
+    [data-state="probuzeni"] .logo-aura,
+    [data-state="puls"] .logo-aura,
+    [data-state="thread"] .logo-aura {
+      animation: logoBreath 3.8s ease-in-out infinite;
+    }
+
+    [data-state="puls"] .logo-core {
+      animation: corePulse 2.4s ease-in-out infinite;
+      filter:
+        drop-shadow(0 0 36px rgba(141, 42, 243, 0.58))
+        drop-shadow(0 0 100px rgba(141, 42, 243, 0.30))
+        drop-shadow(0 0 24px rgba(34, 211, 238, 0.16))
+        drop-shadow(0 0 28px rgba(245, 166, 35, 0.13));
+    }
+
+    [data-state="probuzeni"] .logo-pulse-halo::before,
+    [data-state="puls"] .logo-pulse-halo::before,
+    [data-state="thread"] .logo-pulse-halo::before {
+      animation: pulseHalo 2.7s ease-out infinite;
+    }
+
+    [data-state="probuzeni"] .logo-pulse-halo::after,
+    [data-state="puls"] .logo-pulse-halo::after,
+    [data-state="thread"] .logo-pulse-halo::after {
+      animation: pulseHaloRing 3.1s ease-out infinite;
+    }
+
+    [data-state="puls"] .logo-emitter,
+    [data-state="thread"] .logo-emitter {
+      animation: emitterBreath 2.8s ease-in-out infinite;
+    }
+
+    [data-state="thread"] .thread-origin {
+      animation: threadWake 3.6s ease-in-out infinite, threadGoldRun 2.6s ease-in-out infinite;
+    }
+
+    @keyframes logoBreath {
+      0%, 100% { transform: scale(var(--aura-scale)); filter: blur(34px); }
+      50% { transform: scale(calc(var(--aura-scale) * 1.045)); filter: blur(42px); }
+    }
+
+    @keyframes corePulse {
+      0%, 100% { transform: scale(var(--core-scale)); }
+      45% { transform: scale(calc(var(--core-scale) * 1.035)); }
+      62% { transform: scale(calc(var(--core-scale) * 0.996)); }
+    }
+
+    @keyframes pulseHalo {
+      0% { opacity: 0.72; transform: scale(0.92); }
+      100% { opacity: 0; transform: scale(1.58); }
+    }
+
+    @keyframes pulseHaloRing {
+      0% { opacity: 0.58; transform: scale(0.86); }
+      100% { opacity: 0; transform: scale(1.44); }
+    }
+
+    @keyframes emitterBreath {
+      0%, 100% { filter: blur(14px) brightness(1); }
+      50% { filter: blur(18px) brightness(1.28); }
+    }
+
+    @keyframes threadWake {
+      0%, 100% { opacity: var(--thread-opacity); filter: blur(0); }
+      50% { opacity: 0.78; filter: blur(0.7px); }
+    }
+
+    @keyframes threadGoldRun {
+      0%, 100% { background-position: 50% 0%; }
+      50% { background-position: 50% 42%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition-duration: 1ms !important;
+      }
+    }
+
+    @media (max-width: 760px) {
+      body { overflow: auto; }
+
+      .toolbar {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .logo-system {
+        width: min(86vw, 360px);
+      }
+
+      .thread-origin {
+        top: calc(50% + 110px);
+      }
+
+      .logo-emitter {
+        top: calc(50% + 106px);
+        width: 160px;
+      }
+
+      .signal-label {
+        top: calc(50% + 134px);
+        left: calc(50% + 12px);
+      }
+
+      .state-card {
+        position: static;
+        width: min(100%, 360px);
+        margin: -34px auto 24px;
+      }
+    }
+  </style>
+</head>
+<body data-state="klid">
+  <nav class="nav-preview" id="navPreview" aria-label="Landing nav preview">
+    <div class="nav-brand-preview">
+      <span class="nav-logo-preview" id="navLogoTarget" aria-hidden="true">
+        <img src="../landingpage/puls1sekl.svg" alt="">
+      </span>
+      <span>PULS</span>
+    </div>
+    <span class="nav-cta-preview">[ Zjisti, kde začít ]</span>
+  </nav>
+
+  <nav class="toolbar" aria-label="Logo state controls">
+    <button type="button" data-set-state="klid" class="is-active">Klid</button>
+    <button type="button" data-set-state="probuzeni">Probuzení</button>
+    <button type="button" data-set-state="puls">Puls</button>
+    <button type="button" data-set-state="thread">Přechod do niti</button>
+    <button type="button" data-set-state="nav">Usazení do navu</button>
+  </nav>
+
+  <main class="stage">
+    <section class="logo-system" aria-label="PULS logo motion lab">
+      <div class="logo-aura" aria-hidden="true"></div>
+      <div class="logo-pulse-halo" aria-hidden="true"></div>
+      <div class="logo-emitter" aria-hidden="true"></div>
+      <div class="thread-origin" aria-hidden="true"></div>
+      <div class="signal-label" aria-hidden="true">PULS</div>
+      <div class="logo-core">
+        <img src="../landingpage/puls1sekl.svg" alt="PULS">
+      </div>
+    </section>
+  </main>
+
+  <aside class="state-card">
+    <strong id="stateName">Klid</strong>
+    <span id="stateDescription">Logo je ztišené. Jen drží přítomnost a čeká na první impuls.</span>
+  </aside>
+
+  <script>
+    const labels = {
+      klid: {
+        name: "Klid",
+        description: "Logo je ztišené. Jen drží přítomnost a čeká na první impuls."
+      },
+      probuzeni: {
+        name: "Probuzení",
+        description: "Aura se otevře a logo začne dýchat. Tohle je první náznak energie pod povrchem."
+      },
+      puls: {
+        name: "Puls",
+        description: "Logo je aktivní zdroj. Rytmus je viditelný, ale pořád má zůstat kultivovaný."
+      },
+      thread: {
+        name: "Přechod do niti",
+        description: "Ze středu loga vystupuje svislá nit. Tohle je test návaznosti na thread lab."
+      },
+      nav: {
+        name: "Usazení do navu",
+        description: "Velké logo plynule odcestuje do navu a název PULS se usadí jako orientační značka."
+      }
+    };
+
+    const buttons = document.querySelectorAll("[data-set-state]");
+    const stateName = document.getElementById("stateName");
+    const stateDescription = document.getElementById("stateDescription");
+    const navPreview = document.getElementById("navPreview");
+    const navLogoTarget = document.getElementById("navLogoTarget");
+    const heroLogo = document.querySelector(".logo-core img");
+
+    let transitionTimer = null;
+    let navSettleTimer = null;
+
+    function animateLogoToNav() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        navPreview.classList.add("is-visible", "is-settled");
+        return;
+      }
+
+      const start = heroLogo.getBoundingClientRect();
+      const end = navLogoTarget.getBoundingClientRect();
+      const clone = heroLogo.cloneNode(true);
+      clone.className = "logo-traveler";
+      clone.style.left = `${start.left}px`;
+      clone.style.top = `${start.top}px`;
+      clone.style.width = `${start.width}px`;
+      clone.style.height = `${start.height}px`;
+      document.body.appendChild(clone);
+
+      navPreview.classList.add("is-visible");
+      navPreview.classList.remove("is-settled");
+
+      const dx = end.left + (end.width - start.width) / 2 - start.left;
+      const dy = end.top + (end.height - start.height) / 2 - start.top;
+      const scale = end.width / start.width;
+      const travelDuration = 2200;
+
+      navSettleTimer = window.setTimeout(() => {
+        navPreview.classList.add("is-settled");
+      }, travelDuration * 0.52);
+
+      const motion = clone.animate([
+        {
+          transform: "translate3d(0, 0, 0) scale(1)",
+          opacity: 1,
+          filter: "drop-shadow(0 0 42px rgba(141, 42, 243, 0.58)) drop-shadow(0 0 90px rgba(245, 166, 35, 0.22))"
+        },
+        {
+          offset: 0.34,
+          transform: `translate3d(${dx * 0.28}px, ${dy * 0.28}px, 0) scale(${Math.max(scale * 7.2, 0.58)})`,
+          opacity: 0.98,
+          filter: "drop-shadow(0 0 38px rgba(141, 42, 243, 0.50)) drop-shadow(0 0 78px rgba(245, 166, 35, 0.20))"
+        },
+        {
+          offset: 0.68,
+          transform: `translate3d(${dx * 0.76}px, ${dy * 0.70}px, 0) scale(${Math.max(scale * 3.2, 0.28)})`,
+          opacity: 0.88,
+          filter: "drop-shadow(0 0 28px rgba(245, 166, 35, 0.30)) drop-shadow(0 0 58px rgba(141, 42, 243, 0.24))"
+        },
+        {
+          offset: 0.88,
+          transform: `translate3d(${dx * 0.97}px, ${dy * 0.90}px, 0) scale(${Math.max(scale * 1.62, scale)})`,
+          opacity: 0.62,
+          filter: "drop-shadow(0 0 20px rgba(245, 166, 35, 0.22)) drop-shadow(0 0 40px rgba(141, 42, 243, 0.18))"
+        },
+        {
+          transform: `translate3d(${dx}px, ${dy}px, 0) scale(${scale})`,
+          opacity: 0,
+          filter: "drop-shadow(0 0 18px rgba(141, 42, 243, 0.24))"
+        }
+      ], {
+        duration: travelDuration,
+        easing: "cubic-bezier(0.45, 0, 0.2, 1)",
+        fill: "forwards"
+      });
+
+      motion.onfinish = () => {
+        clone.remove();
+        navPreview.classList.add("is-settled");
+      };
+    }
+
+    function setState(state) {
+      window.clearTimeout(transitionTimer);
+      window.clearTimeout(navSettleTimer);
+      document.querySelectorAll(".logo-traveler").forEach((node) => node.remove());
+      navPreview.classList.toggle("is-visible", state === "nav");
+      navPreview.classList.toggle("is-settled", state === "nav");
+      document.body.dataset.state = state;
+      buttons.forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.setState === state);
+      });
+      stateName.textContent = labels[state].name;
+      stateDescription.textContent = labels[state].description;
+      if (state === "nav") {
+        navPreview.classList.remove("is-settled");
+        transitionTimer = window.setTimeout(animateLogoToNav, 80);
+      }
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => setState(button.dataset.setState));
+    });
+  </script>
+</body>
+</html>
