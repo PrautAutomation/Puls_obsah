@@ -321,6 +321,28 @@ body[data-logo-state="nav"] .thread-svg {
   animation: threadPingFlash 450ms cubic-bezier(.16,1,.3,1), threadAuraBreath 2.5s ease-in-out infinite 450ms;
 }
 
+.thread-lite #puls-thread {
+  --thread-blur: 48px;
+}
+
+.thread-lite .thread-svg {
+  filter: drop-shadow(0 0 30px rgba(141, 42, 243, 0.16));
+  animation: none;
+  transition: opacity 720ms ease;
+}
+
+.thread-lite .thread-fiber {
+  filter: none;
+  animation: none;
+  mix-blend-mode: screen;
+}
+
+.thread-lite .thread-gold {
+  filter: none;
+  stroke-width: 34px;
+  mix-blend-mode: screen;
+}
+
 @keyframes threadFiberWeave {
   0% {
     stroke-dashoffset: 0;
