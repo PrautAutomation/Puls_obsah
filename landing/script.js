@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     headline: "klid",
     problem: "klid",
     "breath-1": "klid",
-    reseni: "klid",
+    reseni: "zhusteni",
     prechod: "flare",
     "breath-2": "flare",
     selektor: "flare",
