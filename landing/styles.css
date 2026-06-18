@@ -36,9 +36,12 @@ body {
   min-height: 100vh;
   background-color: #070a12;
   background:
-    radial-gradient(90% 70% at 50% -10%, rgba(141, 42, 243, 0.14), transparent 54%),
-    radial-gradient(70% 56% at 12% 12%, rgba(34, 211, 238, 0.055), transparent 48%),
-    linear-gradient(180deg, #090d16 0%, var(--bg) 42%, #05070d 100%);
+    url("background.svg") center top / cover fixed no-repeat,
+    radial-gradient(ellipse 58% 78% at 50% 34%, rgba(66, 56, 143, 0.30), rgba(53, 42, 101, 0.18) 34%, transparent 70%),
+    radial-gradient(ellipse 72% 86% at 50% 62%, rgba(48, 34, 96, 0.22), transparent 72%),
+    radial-gradient(70% 56% at 14% 16%, rgba(34, 211, 238, 0.052), transparent 50%),
+    linear-gradient(90deg, #070a12 0%, rgba(23, 20, 49, 0.88) 16%, rgba(48, 34, 96, 0.66) 50%, rgba(23, 20, 49, 0.88) 84%, #070a12 100%),
+    linear-gradient(180deg, #090d16 0%, #0a0e1a 42%, #05070d 100%);
   color: var(--text);
   font-family: var(--font-primary);
   line-height: 1.5;
@@ -69,8 +72,8 @@ a {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 70% 86% at 50% 50%, transparent 0 56%, rgba(9, 13, 28, 0.045) 78%, rgba(8, 10, 24, 0.09) 100%),
-    linear-gradient(90deg, rgba(20, 11, 38, 0.10), transparent 15% 85%, rgba(8, 20, 35, 0.09));
+    radial-gradient(ellipse 74% 88% at 50% 50%, rgba(255, 255, 255, 0.025) 0 18%, transparent 54%, rgba(8, 10, 24, 0.045) 100%),
+    linear-gradient(90deg, rgba(5, 8, 16, 0.18), transparent 18% 82%, rgba(5, 8, 16, 0.18));
 }
 
 p {
@@ -2057,8 +2060,8 @@ blockquote p + p {
 @media (max-width: 760px) {
   #page-vignette {
     background:
-      radial-gradient(ellipse 82% 88% at 50% 50%, transparent 0 62%, rgba(9, 13, 28, 0.035) 82%, rgba(8, 10, 24, 0.065) 100%),
-      linear-gradient(90deg, rgba(20, 11, 38, 0.06), transparent 12% 88%, rgba(8, 20, 35, 0.055));
+      radial-gradient(ellipse 92% 90% at 50% 48%, rgba(255, 255, 255, 0.018) 0 20%, transparent 62%, rgba(8, 10, 24, 0.04) 100%),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.24), transparent 27% 73%, rgba(0, 0, 0, 0.24));
   }
 
   .hero-moment {
