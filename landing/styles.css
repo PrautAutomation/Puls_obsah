@@ -2058,10 +2058,21 @@ blockquote p + p {
 }
 
 @media (max-width: 760px) {
+  body {
+    background:
+      linear-gradient(90deg, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.08) 31%, transparent 50%, rgba(0, 0, 0, 0.08) 69%, rgba(0, 0, 0, 0.38)),
+      url("background.svg") center top / cover fixed no-repeat,
+      radial-gradient(ellipse 58% 78% at 50% 34%, rgba(66, 56, 143, 0.30), rgba(53, 42, 101, 0.18) 34%, transparent 70%),
+      radial-gradient(ellipse 72% 86% at 50% 62%, rgba(48, 34, 96, 0.22), transparent 72%),
+      radial-gradient(70% 56% at 14% 16%, rgba(34, 211, 238, 0.052), transparent 50%),
+      linear-gradient(90deg, #070a12 0%, rgba(23, 20, 49, 0.88) 16%, rgba(48, 34, 96, 0.66) 50%, rgba(23, 20, 49, 0.88) 84%, #070a12 100%),
+      linear-gradient(180deg, #090d16 0%, #0a0e1a 42%, #05070d 100%);
+  }
+
   #page-vignette {
     background:
-      radial-gradient(ellipse 92% 90% at 50% 48%, rgba(255, 255, 255, 0.018) 0 20%, transparent 62%, rgba(8, 10, 24, 0.04) 100%),
-      linear-gradient(90deg, rgba(0, 0, 0, 0.24), transparent 27% 73%, rgba(0, 0, 0, 0.24));
+      radial-gradient(ellipse 92% 90% at 50% 48%, transparent 0 58%, rgba(0, 0, 0, 0.08) 100%),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 28% 72%, rgba(0, 0, 0, 0.18));
   }
 
   .hero-moment {
