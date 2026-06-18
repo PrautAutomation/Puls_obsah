@@ -160,6 +160,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let logoReadyForNav = false;
   let userScrollIntent = false;
   let lastMenuFocus = null;
+  let lastScrollY = window.scrollY;
+  let heroGhostTimer = null;
 
   if (thread && reduceLogoMotion) thread.classList.add("is-reduced");
 
@@ -338,6 +340,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     motion.onfinish = () => {
       traveler.remove();
+      if (heroLogoSystem) heroLogoSystem.classList.remove("is-traveling");
       settleNavLogo();
     };
     motion.oncancel = () => {
@@ -521,6 +524,8 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   function updateNavVisibility() {
+    const currentScrollY = window.scrollY;
+    const isScrollingUp = currentScrollY < lastScrollY;
     const hasScrolled = userScrollIntent && window.scrollY > 8;
     if (hasScrolled) activateGlobalThread("klid");
 
@@ -545,6 +550,17 @@ document.addEventListener("DOMContentLoaded", () => {
       clearLogoTravelers();
     }
 
+    window.clearTimeout(heroGhostTimer);
+    const shouldShowHeroGhost = currentLogoState === "nav" && isScrollingUp && currentScrollY < window.innerHeight * 0.82;
+    document.body.classList.toggle("hero-logo-suppressed", currentScrollY > 8);
+    document.body.classList.toggle("hero-ghost-visible", shouldShowHeroGhost);
+    if (shouldShowHeroGhost) {
+      heroGhostTimer = window.setTimeout(() => {
+        document.body.classList.remove("hero-ghost-visible");
+      }, reduceLogoMotion ? 0 : 1600);
+    }
+
+    lastScrollY = currentScrollY;
     hasScrolledPastNavPoint = scrolledPastNavPoint;
   }
 

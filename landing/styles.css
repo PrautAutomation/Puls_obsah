@@ -768,17 +768,27 @@ body.mobile-menu-open .nav-menu-chevron {
 }
 
 .hero-moment {
-  position: relative;
+  position: sticky;
+  top: 0;
   min-height: 100vh;
   min-height: 100svh;
   align-content: center;
   justify-items: center;
   overflow: hidden;
+  z-index: 0;
   background:
     radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.05), transparent 24%),
     radial-gradient(circle at 50% 62%, rgba(245, 166, 35, 0.035), transparent 31%),
     radial-gradient(circle at 50% 55%, rgba(141, 42, 243, 0.10), transparent 44%);
   text-align: center;
+}
+
+#headline {
+  position: relative;
+  z-index: 3;
+  background:
+    radial-gradient(82% 58% at 50% 20%, rgba(141, 42, 243, 0.08), transparent 62%),
+    linear-gradient(180deg, rgba(7, 10, 18, 0.98), var(--bg) 42%, rgba(7, 10, 18, 0.98));
 }
 
 #finale {
@@ -1026,8 +1036,29 @@ body.hero-ready .hero-logo-system {
 }
 
 .hero-logo-system[data-state="nav"] {
+  --hero-ghost-fade: 260ms;
   opacity: 0;
-  transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity var(--hero-ghost-fade) cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body.hero-ghost-visible .hero-logo-system[data-state="nav"] {
+  --hero-ghost-fade: 1200ms;
+  opacity: 0.14;
+}
+
+body.hero-logo-suppressed:not(.hero-ghost-visible) .hero-logo-system {
+  --hero-ghost-fade: 180ms;
+  opacity: 0;
+  pointer-events: none;
+}
+
+body.hero-ghost-visible .hero-logo-system[data-state="nav"] .hero-logo {
+  opacity: 1;
+  filter:
+    grayscale(1)
+    brightness(1.18)
+    drop-shadow(0 0 16px rgba(255, 255, 255, 0.10));
+  animation: none;
 }
 
 .hero-logo-system.is-traveling {
@@ -1649,6 +1680,12 @@ blockquote p + p {
 }
 
 @media (max-width: 760px) {
+  .hero-moment {
+    position: relative;
+    top: auto;
+    z-index: 2;
+  }
+
   .moment {
     min-height: max(54vh, 420px);
     padding: 80px 1.5rem;
@@ -1783,6 +1820,11 @@ blockquote p + p {
   .mobile-menu-contact::after,
   .hero-logo-system {
     transition-duration: 0s !important;
+  }
+
+  .hero-moment {
+    position: relative;
+    top: auto;
   }
 
   .nav-pill {
