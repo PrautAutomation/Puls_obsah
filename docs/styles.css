@@ -26,11 +26,15 @@
 }
 
 html {
+  background: #070a12;
   scroll-behavior: smooth;
+  overscroll-behavior-y: none;
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
+  background-color: #070a12;
   background:
     radial-gradient(90% 70% at 50% -10%, rgba(141, 42, 243, 0.14), transparent 54%),
     radial-gradient(70% 56% at 12% 12%, rgba(34, 211, 238, 0.055), transparent 48%),
@@ -341,6 +345,62 @@ body[data-logo-state="nav"] .thread-svg {
   filter: none;
   stroke-width: 34px;
   mix-blend-mode: screen;
+}
+
+.is-safari #puls-thread {
+  overflow: hidden;
+}
+
+.is-safari #puls-thread::before,
+.is-safari #puls-thread::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 50%;
+  height: 100vh;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition:
+    opacity 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.is-safari #puls-thread::before {
+  width: max(2px, var(--thread-stroke));
+  opacity: var(--thread-opacity);
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(141, 42, 243, 0.14) 14%,
+      rgba(141, 42, 243, 0.58) 45%,
+      rgba(34, 211, 238, var(--thread-cyan-opacity)) 54%,
+      rgba(141, 42, 243, 0.42) 68%,
+      transparent 100%
+    );
+  box-shadow:
+    0 0 22px rgba(141, 42, 243, 0.20),
+    0 0 58px rgba(141, 42, 243, 0.12);
+}
+
+.is-safari #puls-thread::after {
+  width: 42px;
+  opacity: var(--thread-gold-opacity);
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(245, 166, 35, 0.12) 24%,
+      rgba(245, 166, 35, 0.42) 50%,
+      rgba(245, 166, 35, 0.14) 76%,
+      transparent 100%
+    );
+  box-shadow: 0 0 48px rgba(245, 166, 35, 0.16);
+}
+
+.is-safari .thread-svg {
+  display: none;
 }
 
 @keyframes threadFiberWeave {

@@ -192,6 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function syncThreadLiteMode() {
     threadLiteMode = isSafari || threadLiteQuery.matches || reduceLogoMotion;
     document.documentElement.classList.toggle("thread-lite", threadLiteMode);
+    document.documentElement.classList.toggle("is-safari", isSafari);
   }
 
   if (thread && reduceLogoMotion) thread.classList.add("is-reduced");
