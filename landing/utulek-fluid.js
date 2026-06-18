@@ -805,16 +805,47 @@
     }
   }
 
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const mobileFallback = window.matchMedia("(max-width: 760px)").matches || reducedMotion;
+  const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const mobileFallbackQuery = window.matchMedia("(max-width: 760px)");
   let smoke = null;
   let active = false;
   let settleTimer = null;
 
+  function shouldUseFallback() {
+    return mobileFallbackQuery.matches || reducedMotionQuery.matches;
+  }
+
   function getSmoke() {
-    if (mobileFallback) return null;
+    if (shouldUseFallback()) return null;
     if (!smoke) smoke = new UtulekFluidField(canvas, quoteCard);
     return smoke;
+  }
+
+  function syncResponsiveMode() {
+    if (!active) return;
+
+    if (shouldUseFallback()) {
+      if (smoke) smoke.stop();
+      smokeField.classList.remove("is-active", "is-fading");
+      fallbackHalo.classList.add("is-active");
+      quoteCard.classList.add("is-settled");
+      return;
+    }
+
+    const field = getSmoke();
+    if (!field || !field.gl) return;
+    fallbackHalo.classList.remove("is-active");
+    smokeField.classList.remove("is-fading");
+    smokeField.classList.add("is-active");
+    field.start();
+  }
+
+  function addMediaQueryListener(query, callback) {
+    if (typeof query.addEventListener === "function") {
+      query.addEventListener("change", callback);
+    } else if (typeof query.addListener === "function") {
+      query.addListener(callback);
+    }
   }
 
   function activate() {
@@ -852,6 +883,9 @@
       if (!active && smoke) smoke.stop();
     }, 1500);
   }
+
+  addMediaQueryListener(mobileFallbackQuery, syncResponsiveMode);
+  addMediaQueryListener(reducedMotionQuery, syncResponsiveMode);
 
   window.pulsUtulek = {
     activate,

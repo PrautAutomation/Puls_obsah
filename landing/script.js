@@ -44,7 +44,7 @@ const TIERS = {
   }
 };
 
-const CO_DOSTANES = "10 pracovních dní. Živé online hodiny. Krátký vstupní dotazník — žádný test tvých znalostí, jen potřebujeme znát tvůj kontext, abychom příklady trefili do tvé praxe. Všechny materiály a postavená workflow ti zůstanou navždy.";
+const CO_DOSTANES = "10 pracovních dní. Živé online hodiny. Krátký vstupní dotazník – žádný test tvých znalostí, jen potřebujeme znát tvůj kontext, abychom příklady trefili do tvé praxe. Všechny materiály a postavená workflow ti zůstanou navždy.";
 const NAV_REVEAL_POINT = 0.56;
 const HERO_READY_DELAY = 120;
 const HERO_INTRO_DELAY = 1000;
@@ -71,6 +71,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const SVG_NS = "http://www.w3.org/2000/svg";
   const logoStates = new Set(["klid", "probuzeni", "puls", "thread", "nav"]);
   const threadStates = new Set(["zazeh", "klid", "zhusteni", "flare", "ping-flash", "utulek", "doutnak"]);
+  const sectionStateMap = {
+    hero: "klid",
+    headline: "klid",
+    problem: "klid",
+    "breath-1": "klid",
+    reseni: "zhusteni",
+    prechod: "flare",
+    "breath-2": "flare",
+    selektor: "flare",
+    certifikat: "zhusteni",
+    planner: "klid",
+    nemluvis: "zhusteni",
+    "tereza-quote": "utulek",
+    "breath-3": "klid",
+    garance: "klid",
+    sef: "klid",
+    finale: "doutnak",
+    footer: "doutnak"
+  };
   const threadStateConfig = {
     zazeh: {
       density: 14,
@@ -162,6 +181,9 @@ document.addEventListener("DOMContentLoaded", () => {
   let lastMenuFocus = null;
   let lastScrollY = window.scrollY;
   let heroGhostTimer = null;
+  let desiredUtulekActive = false;
+  let observedStateSections = [];
+  let scrollUpdateScheduled = false;
 
   if (thread && reduceLogoMotion) thread.classList.add("is-reduced");
 
@@ -409,6 +431,52 @@ document.addEventListener("DOMContentLoaded", () => {
     thread.style.setProperty("--thread-rate", config.rate);
   }
 
+  function freezeThreadCloneStyles(layerClone, goldClone) {
+    layerClone.querySelectorAll(".thread-fiber").forEach((fiber) => {
+      const styles = window.getComputedStyle(fiber);
+      fiber.style.opacity = styles.opacity;
+      fiber.style.stroke = styles.stroke;
+      fiber.style.strokeWidth = styles.strokeWidth;
+      fiber.style.animation = "none";
+    });
+
+    if (goldClone) {
+      const styles = window.getComputedStyle(goldClone);
+      goldClone.style.opacity = styles.opacity;
+      goldClone.style.stroke = styles.stroke;
+      goldClone.style.strokeWidth = styles.strokeWidth;
+      goldClone.style.animation = "none";
+    }
+  }
+
+  function prepareThreadCrossfade() {
+    if (reduceLogoMotion || !threadFiberLayer || !threadGoldPath) return null;
+    if (!threadFiberLayer.children.length && !threadGoldPath.getAttribute("d")) return null;
+
+    const previousLayer = threadFiberLayer.cloneNode(true);
+    const previousGold = threadGoldPath.cloneNode(true);
+    previousLayer.removeAttribute("id");
+    previousGold.removeAttribute("id");
+
+    threadFiberLayer.parentNode.insertBefore(previousGold, threadGoldPath);
+    threadFiberLayer.parentNode.insertBefore(previousLayer, threadFiberLayer);
+    freezeThreadCloneStyles(previousLayer, previousGold);
+    previousLayer.animate(
+      [{ opacity: 1 }, { opacity: 0 }],
+      { duration: 1180, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "forwards" }
+    );
+    previousGold.animate(
+      [{ opacity: Number(window.getComputedStyle(previousGold).opacity) || 1 }, { opacity: 0 }],
+      { duration: 1320, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "forwards" }
+    );
+    window.setTimeout(() => {
+      previousLayer.remove();
+      previousGold.remove();
+    }, 1320);
+
+    return true;
+  }
+
   function renderThreadFibers(state) {
     const config = threadStateConfig[state];
     if (!config || !threadFiberLayer || !threadGoldPath) return;
@@ -417,8 +485,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const seed = [...state].reduce((sum, char) => sum + char.charCodeAt(0), density * 97);
     const random = seededRandom(seed);
     const spread = config.spread || 1;
+    const shouldCrossfade = state !== "ping-flash" && state !== "zazeh" && prepareThreadCrossfade();
 
     threadFiberLayer.replaceChildren();
+    threadFiberLayer.classList.toggle("is-entering", Boolean(shouldCrossfade));
+    threadGoldPath.classList.toggle("is-entering", Boolean(shouldCrossfade));
     applyThreadStateVars(config);
 
     for (let i = 0; i < density; i++) {
@@ -448,6 +519,15 @@ document.addEventListener("DOMContentLoaded", () => {
       speed: 1,
       secondaryAmp: 2
     }));
+
+    if (shouldCrossfade) {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          threadFiberLayer.classList.remove("is-entering");
+          threadGoldPath.classList.remove("is-entering");
+        });
+      });
+    }
   }
 
   function setLogoState(state) {
@@ -495,6 +575,69 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function syncUtulekState(isActive) {
+    desiredUtulekActive = isActive;
+    if (!window.pulsUtulek) return;
+    if (isActive && !window.pulsUtulek.isActive) {
+      window.pulsUtulek.activate();
+    } else if (!isActive && window.pulsUtulek.isActive) {
+      window.pulsUtulek.deactivate();
+    }
+  }
+
+  function applySectionThreadState(state) {
+    if (!state) return;
+    syncUtulekState(state === "utulek");
+    if (currentThreadState === "zazeh" || currentThreadState === "ping-flash") return;
+    if (state !== currentThreadState) setThreadState(state);
+  }
+
+  function getActiveSectionId() {
+    if (!observedStateSections.length) return null;
+    const anchorY = window.innerHeight * 0.68;
+    const candidates = observedStateSections
+      .map((section) => {
+        const rect = section.getBoundingClientRect();
+        const containsAnchor = rect.top <= anchorY && rect.bottom >= anchorY;
+        const distance = Math.abs((rect.top + rect.bottom) / 2 - anchorY);
+        return { id: section.id, rect, containsAnchor, distance };
+      })
+      .filter(({ id, rect }) => {
+        if (id === "hero" && window.scrollY > 16) return false;
+        return rect.bottom > 0 && rect.top < window.innerHeight;
+      });
+
+    const anchored = candidates
+      .filter(({ containsAnchor }) => containsAnchor)
+      .sort((a, b) => a.distance - b.distance)[0];
+
+    if (anchored) return anchored.id;
+    return candidates.sort((a, b) => a.distance - b.distance)[0]?.id ?? null;
+  }
+
+  function updateSectionStateFromScroll() {
+    const activeId = getActiveSectionId();
+    if (activeId) {
+      applySectionThreadState(sectionStateMap[activeId]);
+    }
+  }
+
+  function setupSectionObserver() {
+    observedStateSections = Object.keys(sectionStateMap)
+      .map((id) => document.getElementById(id))
+      .filter(Boolean);
+
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(() => {
+        updateSectionStateFromScroll();
+      }, { threshold: [0.3, 0.5, 0.7] });
+
+      observedStateSections.forEach((section) => observer.observe(section));
+    }
+
+    updateSectionStateFromScroll();
+  }
+
   window.pulsLogo = {
     get currentState() {
       return currentLogoState;
@@ -524,6 +667,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   function updateNavVisibility() {
+    scrollUpdateScheduled = false;
     const currentScrollY = window.scrollY;
     const isScrollingUp = currentScrollY < lastScrollY;
     const hasScrolled = userScrollIntent && window.scrollY > 8;
@@ -562,6 +706,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     lastScrollY = currentScrollY;
     hasScrolledPastNavPoint = scrolledPastNavPoint;
+    updateSectionStateFromScroll();
+  }
+
+  function scheduleScrollUpdate() {
+    if (scrollUpdateScheduled) return;
+    scrollUpdateScheduled = true;
+    window.requestAnimationFrame(updateNavVisibility);
   }
 
   function setMobileMenuOpen(isOpen) {
@@ -653,8 +804,8 @@ document.addEventListener("DOMContentLoaded", () => {
             <p class="price-sub">Garantujeme měřitelné výsledky. Podrobnosti v obchodních podmínkách.</p>
           </div>
           <div class="reveal-cta">
-            <a class="cta-primary mono" href="${createMailtoSubject("Objednávka", tier.name)}">[ Objednat ${tier.name} ]</a>
-            <a class="cta-secondary" href="${createMailtoSubject("Dotaz", tier.name)}">Chci se nejdřív zeptat — nezávazně, ozveme se do 24 hodin</a>
+            <a class="cta-primary cta-contact" href="${createMailtoSubject("Objednávka", tier.name)}">Objednat ${tier.name}</a>
+            <a class="cta-secondary cta-contact" href="${createMailtoSubject("Dotaz", tier.name)}">Chci se nejdřív zeptat – nezávazně, ozveme se do 24 hodin</a>
           </div>
         </div>
         <p class="reveal-footer mono">Není to tvoje úroveň? Zkus jinou odpověď.</p>
@@ -676,6 +827,9 @@ document.addEventListener("DOMContentLoaded", () => {
   setThreadState("klid");
   playHeroZazehSequence();
   updateNavVisibility();
+  setupSectionObserver();
+  window.addEventListener("load", () => syncUtulekState(desiredUtulekActive));
+
   function markUserScrollIntent() {
     userScrollIntent = true;
   }
@@ -686,8 +840,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const scrollKeys = ["ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End", " "];
     if (scrollKeys.includes(event.key)) markUserScrollIntent();
   });
-  window.addEventListener("scroll", updateNavVisibility, { passive: true });
-  window.addEventListener("resize", updateNavVisibility);
+  window.addEventListener("scroll", scheduleScrollUpdate, { passive: true });
+  window.addEventListener("resize", scheduleScrollUpdate);
   if (mobileMenuToggle) {
     mobileMenuToggle.addEventListener("click", () => {
       setMobileMenuOpen(!document.body.classList.contains("mobile-menu-open"));
