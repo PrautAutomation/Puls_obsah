@@ -67,6 +67,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const tierBands = document.querySelectorAll(".tier-band");
   const tierList = document.querySelector(".tier-list");
   const reduceLogoMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+    && !/CriOS|FxiOS|EdgiOS/i.test(navigator.userAgent);
+  const threadLiteQuery = window.matchMedia("(max-width: 760px)");
+  let threadLiteMode = isSafari || threadLiteQuery.matches || reduceLogoMotion;
+  let threadStaticFallback = isSafari && !threadLiteQuery.matches;
   const compactLogoMotion = window.matchMedia("(max-width: 760px)").matches;
   const SVG_NS = "http://www.w3.org/2000/svg";
   const logoStates = new Set(["klid", "probuzeni", "puls", "thread", "nav"]);
@@ -76,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     headline: "klid",
     problem: "klid",
     "breath-1": "klid",
-    reseni: "klid",
+    reseni: "zhusteni",
     prechod: "flare",
     "breath-2": "flare",
     selektor: "flare",
@@ -185,7 +190,21 @@ document.addEventListener("DOMContentLoaded", () => {
   let observedStateSections = [];
   let scrollUpdateScheduled = false;
 
+  function syncThreadLiteMode() {
+    threadLiteMode = isSafari || threadLiteQuery.matches || reduceLogoMotion;
+    threadStaticFallback = isSafari && !threadLiteQuery.matches;
+    document.documentElement.classList.toggle("thread-lite", threadLiteMode);
+    document.documentElement.classList.toggle("is-safari", isSafari);
+    document.documentElement.classList.toggle("thread-static-fallback", threadStaticFallback);
+  }
+
   if (thread && reduceLogoMotion) thread.classList.add("is-reduced");
+  syncThreadLiteMode();
+  if (threadLiteQuery.addEventListener) {
+    threadLiteQuery.addEventListener("change", syncThreadLiteMode);
+  } else if (threadLiteQuery.addListener) {
+    threadLiteQuery.addListener(syncThreadLiteMode);
+  }
 
   window.setTimeout(() => {
     document.body.classList.add("hero-ready");
@@ -450,6 +469,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function prepareThreadCrossfade() {
+    if (threadLiteMode) return null;
     if (reduceLogoMotion || !threadFiberLayer || !threadGoldPath) return null;
     if (!threadFiberLayer.children.length && !threadGoldPath.getAttribute("d")) return null;
 
@@ -481,7 +501,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const config = threadStateConfig[state];
     if (!config || !threadFiberLayer || !threadGoldPath) return;
 
-    const density = config.density;
+    const density = threadLiteMode ? Math.max(3, Math.ceil(config.density * 0.55)) : config.density;
     const seed = [...state].reduce((sum, char) => sum + char.charCodeAt(0), density * 97);
     const random = seededRandom(seed);
     const spread = config.spread || 1;
@@ -497,7 +517,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const xOffset = Math.pow(centerBias, 2) * 40 * spread * weightedSign(random);
       const phase = randomBetween(random, 0, Math.PI * 2);
       const speed = randomBetween(random, 0.8, 1.4);
-      const amplitude = randomBetween(random, config.amplitude[0], config.amplitude[1]);
+      const amplitudeScale = threadLiteMode ? 0.72 : 1;
+      const amplitude = randomBetween(random, config.amplitude[0], config.amplitude[1]) * amplitudeScale;
       const secondaryAmp = randomBetween(random, 1.5, 5);
       const path = document.createElementNS(SVG_NS, "path");
       const isCyan = random() < config.cyan;
@@ -587,9 +608,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function applySectionThreadState(state) {
     if (!state) return;
-    syncUtulekState(state === "utulek");
+    const resolvedState = threadLiteQuery.matches && state !== "utulek" ? "klid" : state;
+    syncUtulekState(resolvedState === "utulek");
     if (currentThreadState === "zazeh" || currentThreadState === "ping-flash") return;
-    if (state !== currentThreadState) setThreadState(state);
+    if (resolvedState !== currentThreadState) setThreadState(resolvedState);
   }
 
   function getActiveSectionId() {
@@ -661,7 +683,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     setState: setThreadState,
     triggerPing() {
-      if (reduceLogoMotion) return;
+      if (reduceLogoMotion || threadLiteQuery.matches) return;
       setThreadState("ping-flash", { remember: false });
     }
   };

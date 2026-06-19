@@ -26,15 +26,22 @@
 }
 
 html {
+  background: #070a12;
   scroll-behavior: smooth;
+  overscroll-behavior-y: none;
 }
 
 body {
   margin: 0;
+  min-height: 100vh;
+  background-color: #070a12;
   background:
-    radial-gradient(90% 70% at 50% -10%, rgba(141, 42, 243, 0.14), transparent 54%),
-    radial-gradient(70% 56% at 12% 12%, rgba(34, 211, 238, 0.055), transparent 48%),
-    linear-gradient(180deg, #090d16 0%, var(--bg) 42%, #05070d 100%);
+    url("background.svg") center top / cover fixed no-repeat,
+    radial-gradient(ellipse 58% 78% at 50% 34%, rgba(66, 56, 143, 0.30), rgba(53, 42, 101, 0.18) 34%, transparent 70%),
+    radial-gradient(ellipse 72% 86% at 50% 62%, rgba(48, 34, 96, 0.22), transparent 72%),
+    radial-gradient(70% 56% at 14% 16%, rgba(34, 211, 238, 0.052), transparent 50%),
+    linear-gradient(90deg, #070a12 0%, rgba(23, 20, 49, 0.88) 16%, rgba(48, 34, 96, 0.66) 50%, rgba(23, 20, 49, 0.88) 84%, #070a12 100%),
+    linear-gradient(180deg, #090d16 0%, #0a0e1a 42%, #05070d 100%);
   color: var(--text);
   font-family: var(--font-primary);
   line-height: 1.5;
@@ -65,8 +72,8 @@ a {
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 70% 86% at 50% 50%, transparent 0 56%, rgba(9, 13, 28, 0.045) 78%, rgba(8, 10, 24, 0.09) 100%),
-    linear-gradient(90deg, rgba(20, 11, 38, 0.10), transparent 15% 85%, rgba(8, 20, 35, 0.09));
+    radial-gradient(ellipse 74% 88% at 50% 50%, rgba(255, 255, 255, 0.025) 0 18%, transparent 54%, rgba(8, 10, 24, 0.045) 100%),
+    linear-gradient(90deg, rgba(5, 8, 16, 0.18), transparent 18% 82%, rgba(5, 8, 16, 0.18));
 }
 
 p {
@@ -242,7 +249,7 @@ body[data-logo-state="nav"] #puls-thread {
     drop-shadow(0 0 calc(var(--thread-blur) * 0.28) rgba(141, 42, 243, 0.18))
     drop-shadow(0 0 var(--thread-blur) rgba(141, 42, 243, 0.10));
   animation: threadAuraBreath var(--thread-rate) ease-in-out infinite;
-  transition: filter 1040ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 1040ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 body[data-logo-state="puls"] .thread-svg,
@@ -321,6 +328,213 @@ body[data-logo-state="nav"] .thread-svg {
   animation: threadPingFlash 450ms cubic-bezier(.16,1,.3,1), threadAuraBreath 2.5s ease-in-out infinite 450ms;
 }
 
+.thread-lite #puls-thread {
+  --thread-blur: 48px;
+}
+
+.thread-lite .thread-svg {
+  filter: drop-shadow(0 0 30px rgba(141, 42, 243, 0.16));
+  transition: opacity 720ms ease;
+}
+
+.thread-lite .thread-fiber {
+  filter: none;
+  mix-blend-mode: screen;
+}
+
+.thread-lite .thread-gold {
+  filter: none;
+  stroke-width: 34px;
+  mix-blend-mode: screen;
+}
+
+.thread-lite:not(.thread-static-fallback) .thread-svg {
+  animation: none;
+}
+
+.thread-lite:not(.thread-static-fallback) .thread-fiber {
+  animation: threadFiberWeave 7.5s ease-in-out infinite alternate;
+}
+
+.thread-static-fallback #puls-thread {
+  overflow: hidden;
+}
+
+.thread-static-fallback #puls-thread::before,
+.thread-static-fallback #puls-thread::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 50%;
+  height: 100vh;
+  pointer-events: none;
+  transform: translateX(-50%);
+  transition:
+    opacity 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 760ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 760ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.thread-static-fallback #puls-thread::before {
+  width: max(2px, var(--thread-stroke));
+  opacity: var(--thread-opacity);
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(141, 42, 243, 0.14) 14%,
+      rgba(141, 42, 243, 0.58) 45%,
+      rgba(34, 211, 238, var(--thread-cyan-opacity)) 54%,
+      rgba(141, 42, 243, 0.42) 68%,
+      transparent 100%
+    );
+  box-shadow:
+    0 0 22px rgba(141, 42, 243, 0.20),
+    0 0 58px rgba(141, 42, 243, 0.12);
+  animation: safariThreadCore var(--thread-rate) ease-in-out infinite;
+}
+
+.thread-static-fallback #puls-thread::after {
+  width: 110px;
+  opacity: calc(var(--thread-gold-opacity) + 0.03);
+  background:
+    radial-gradient(ellipse 34px 46% at 50% 52%, rgba(245, 166, 35, 0.16), transparent 72%),
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(245, 166, 35, 0.10) 20%,
+      rgba(245, 166, 35, 0.32) 50%,
+      rgba(245, 166, 35, 0.10) 78%,
+      transparent 100%
+    );
+  box-shadow:
+    0 0 42px rgba(245, 166, 35, 0.14),
+    0 0 80px rgba(141, 42, 243, 0.10);
+  animation: safariThreadBreath var(--thread-rate) ease-in-out infinite;
+}
+
+.thread-static-fallback .thread-svg {
+  display: none;
+}
+
+.safari-thread-strands {
+  display: none;
+}
+
+.thread-static-fallback .safari-thread-strands {
+  display: block;
+  position: fixed;
+  inset: 0;
+  left: 50%;
+  width: 172px;
+  height: 100vh;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.safari-strand {
+  position: absolute;
+  top: -6vh;
+  bottom: -6vh;
+  left: 50%;
+  width: 2px;
+  border-radius: 999px;
+  opacity: calc(var(--thread-opacity) * 0.72);
+  transform-origin: 50% 50%;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      currentColor 18%,
+      currentColor 82%,
+      transparent 100%
+    );
+  box-shadow: 0 0 18px currentColor;
+  animation: safariStrandDrift var(--thread-rate) ease-in-out infinite alternate;
+}
+
+.safari-strand:nth-child(1) {
+  color: rgba(141, 42, 243, 0.72);
+  transform: translateX(-34px) rotate(-1.6deg) scaleY(0.94);
+  animation-delay: -1.2s;
+}
+
+.safari-strand:nth-child(2) {
+  color: rgba(34, 211, 238, 0.52);
+  width: 2px;
+  transform: translateX(-20px) rotate(0.9deg) scaleY(1.02);
+  opacity: calc(var(--thread-cyan-opacity) + 0.20);
+  animation-delay: -2.1s;
+}
+
+.safari-strand:nth-child(3) {
+  color: rgba(34, 211, 238, 0.46);
+  transform: translateX(-9px) rotate(-0.7deg) scaleY(0.88);
+  opacity: calc(var(--thread-cyan-opacity) + 0.10);
+  animation-delay: -0.6s;
+}
+
+.safari-strand:nth-child(4) {
+  color: rgba(141, 42, 243, 0.86);
+  width: 2.5px;
+  transform: translateX(0) rotate(0.3deg) scaleY(1);
+  animation-delay: -1.8s;
+}
+
+.safari-strand:nth-child(5) {
+  color: rgba(34, 211, 238, 0.48);
+  width: 2px;
+  transform: translateX(15px) rotate(-1deg) scaleY(0.98);
+  opacity: calc(var(--thread-cyan-opacity) + 0.18);
+  animation-delay: -2.8s;
+}
+
+.safari-strand:nth-child(6) {
+  color: rgba(141, 42, 243, 0.62);
+  transform: translateX(28px) rotate(1.4deg) scaleY(0.92);
+  animation-delay: -0.9s;
+}
+
+.safari-strand:nth-child(7) {
+  color: rgba(34, 211, 238, 0.34);
+  transform: translateX(42px) rotate(-1.2deg) scaleY(0.82);
+  opacity: calc(var(--thread-cyan-opacity) + 0.06);
+  animation-delay: -2.4s;
+}
+
+@keyframes safariThreadBreath {
+  0%, 100% {
+    transform: translateX(-50%) scaleX(0.96);
+    opacity: calc(var(--thread-gold-opacity) + 0.02);
+  }
+  50% {
+    transform: translateX(-50%) scaleX(1.08);
+    opacity: calc(var(--thread-gold-opacity) + 0.08);
+  }
+}
+
+@keyframes safariThreadCore {
+  0%, 100% {
+    transform: translateX(calc(-50% - 1px)) scaleX(0.94);
+    opacity: calc(var(--thread-opacity) * 0.82);
+  }
+  50% {
+    transform: translateX(calc(-50% + 1px)) scaleX(1.08);
+    opacity: var(--thread-opacity);
+  }
+}
+
+@keyframes safariStrandDrift {
+  0% {
+    margin-left: -2px;
+    opacity: calc(var(--thread-opacity) * 0.58);
+  }
+  100% {
+    margin-left: 2px;
+    opacity: calc(var(--thread-opacity) * 0.78);
+  }
+}
+
 @keyframes threadFiberWeave {
   0% {
     stroke-dashoffset: 0;
@@ -337,14 +551,10 @@ body[data-logo-state="nav"] .thread-svg {
 
 @keyframes threadAuraBreath {
   0%, 100% {
-    filter:
-      drop-shadow(0 0 calc(var(--thread-blur) * 0.22) rgba(141, 42, 243, 0.14))
-      drop-shadow(0 0 var(--thread-blur) rgba(141, 42, 243, 0.09));
+    opacity: 0.88;
   }
   50% {
-    filter:
-      drop-shadow(0 0 calc(var(--thread-blur) * 0.36) rgba(141, 42, 243, 0.22))
-      drop-shadow(0 0 calc(var(--thread-blur) * 1.4) rgba(141, 42, 243, 0.13));
+    opacity: 1;
   }
 }
 
@@ -1848,10 +2058,21 @@ blockquote p + p {
 }
 
 @media (max-width: 760px) {
+  body {
+    background:
+      linear-gradient(90deg, rgba(0, 0, 0, 0.38), rgba(0, 0, 0, 0.08) 31%, transparent 50%, rgba(0, 0, 0, 0.08) 69%, rgba(0, 0, 0, 0.38)),
+      url("background.svg") center top / cover fixed no-repeat,
+      radial-gradient(ellipse 58% 78% at 50% 34%, rgba(66, 56, 143, 0.30), rgba(53, 42, 101, 0.18) 34%, transparent 70%),
+      radial-gradient(ellipse 72% 86% at 50% 62%, rgba(48, 34, 96, 0.22), transparent 72%),
+      radial-gradient(70% 56% at 14% 16%, rgba(34, 211, 238, 0.052), transparent 50%),
+      linear-gradient(90deg, #070a12 0%, rgba(23, 20, 49, 0.88) 16%, rgba(48, 34, 96, 0.66) 50%, rgba(23, 20, 49, 0.88) 84%, #070a12 100%),
+      linear-gradient(180deg, #090d16 0%, #0a0e1a 42%, #05070d 100%);
+  }
+
   #page-vignette {
     background:
-      radial-gradient(ellipse 82% 88% at 50% 50%, transparent 0 62%, rgba(9, 13, 28, 0.035) 82%, rgba(8, 10, 24, 0.065) 100%),
-      linear-gradient(90deg, rgba(20, 11, 38, 0.06), transparent 12% 88%, rgba(8, 20, 35, 0.055));
+      radial-gradient(ellipse 92% 90% at 50% 48%, transparent 0 58%, rgba(0, 0, 0, 0.08) 100%),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 28% 72%, rgba(0, 0, 0, 0.18));
   }
 
   .hero-moment {
